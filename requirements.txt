@@ -1,0 +1,9 @@
+streamlit
+pymongo
+bcrypt
+pypdf2
+langchain
+langchain-community
+langchain-mongodb
+huggingface-hub
+sentence-transformers
