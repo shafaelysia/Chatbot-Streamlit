@@ -2,7 +2,7 @@ import bcrypt
 import streamlit as st
 import pytz
 import os
-from models.Conversation import Conversation
+import uuid
 
 USER_IMAGE_DIR = "assets/users/"
 
@@ -30,8 +30,11 @@ def initialize_session():
     if 'username' not in st.session_state:
         st.session_state.username = None
 
-    if 'chosen_chat' not in st.session_state:
-        st.session_state.chosen_chat = None
+    if 'chat_session_id' not in st.session_state:
+        st.session_state.chat_session_id = None
+
+    if 'messages' not in st.session_state:
+        st.session_state.messages = []
 
 def clear_session():
     del st.session_state.is_authenticated
@@ -39,7 +42,8 @@ def clear_session():
     del st.session_state.is_admin
     del st.session_state.username
     del st.session_state.user_id
-    del st.session_state.chosen_chat
+    del st.session_state.chat_session_id
+    del st.session_state.messages
 
 def check_auth(page):
     if page in ["Login", "Register"]:
@@ -67,7 +71,7 @@ def check_session_states():
     st.write("username: " + str(st.session_state.username))
     st.write("user_id: " + str(st.session_state.user_id))
     st.write("role: " + str(st.session_state.role))
-    st.write("chosen_chat:  " + str(st.session_state.chosen_chat))
+    st.write("chat_session_id:  " + str(st.session_state.chat_session_id))
 
 def convert_to_local(utc_dt):
     local_tz = pytz.timezone("YOUR_TIMEZONE")  # e.g., "America/New_York"
@@ -102,8 +106,5 @@ def display_chat(sender, content):
     with st.chat_message(sender):
         st.write(content)
 
-def show_chat_history():
-    chat_history = Conversation.get_one_chat({"title": st.session_state.chosen_chat})
-    for message in chat_history.messages:
-        display_chat("user", message.prompt)
-        display_chat("assistant", message.response)
+def generate_session_id():
+    return str(uuid.uuid4())

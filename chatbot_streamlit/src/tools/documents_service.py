@@ -4,7 +4,7 @@ from langchain.docstore.document import Document
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_mongodb.vectorstores import MongoDBAtlasVectorSearch
 from langchain_community.embeddings import HuggingFaceEmbeddings
-from db import get_collection
+from services.db import get_collection
 
 def load_embedding_model(model_name):
     model_kwargs = {'device': 'cpu'}
