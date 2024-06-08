@@ -1,10 +1,9 @@
 import streamlit as st
 from PIL import Image
-from models.Conversation import Conversation
-from services.auth_service import logout
+from tools.auth import logout
+from tools.chat import get_all_users_chats, get_chat_history_by_session
 from langchain_core.messages.human import HumanMessage
 from langchain_core.messages.ai import AIMessage
-from services.inference_service import get_chat_history
 
 def sidebar():
     with st.sidebar:
@@ -17,7 +16,7 @@ def sidebar():
             st.divider()
 
         with st.container(height=300, border=False):
-            if st.session_state.chat_session_id is None or not st.session_state.messages:
+            if st.session_state.chat_session_id is None:
                 new_chat_button = st.button("New Chat", use_container_width=True, type="primary")
             else:
                 new_chat_button = st.button("New Chat", use_container_width=True)
@@ -27,16 +26,16 @@ def sidebar():
                 st.session_state.messages = []
                 st.rerun()
 
-            for chat in Conversation.get_user_chats({"user_id": st.session_state.user_id}):
+            for chat in get_all_users_chats({"user_id": st.session_state.user_id}):
                 if st.session_state.chat_session_id == chat["session_id"]:
-                    chat_button = st.button(chat["title"], use_container_width=True, type="primary")
+                    chat_button = st.button(chat["title"], use_container_width=True, type="primary", key=chat["session_id"])
                 else:
-                    chat_button = st.button(chat["title"], use_container_width=True)
+                    chat_button = st.button(chat["title"], use_container_width=True, key=chat["session_id"])
 
                 if chat_button:
                     st.session_state.chat_session_id = chat["session_id"]
                     st.session_state.messages = []
-                    for message in get_chat_history():
+                    for message in get_chat_history_by_session(st.session_state.chat_session_id):
                         if isinstance(message, HumanMessage):
                             st.session_state.messages.append({"role": "user", "content": message.content})
                         elif isinstance(message, AIMessage):

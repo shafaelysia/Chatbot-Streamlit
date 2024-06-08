@@ -1,5 +1,5 @@
 import streamlit as st
-from services.auth_service import logout
+from tools.auth import logout
 from utils.helpers import initialize_session, check_auth, check_session_states
 
 def main():

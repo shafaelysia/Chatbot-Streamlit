@@ -1,10 +1,8 @@
 import streamlit as st
-from services.auth_service import register
+from tools.auth import register
 from utils.helpers import initialize_session, check_auth
 
 def main():
-    initialize_session()
-    st.set_page_config(page_title="Register", page_icon="", layout="centered")
     check_auth("Register")
 
     with st.form("register"):
@@ -35,4 +33,6 @@ def main():
     st.page_link("pages/login.py", label="Login here!")
 
 if __name__ == "__main__":
+    initialize_session()
+    st.set_page_config(page_title="Register", page_icon="", layout="centered")
     main()

@@ -1,5 +1,5 @@
 from datetime import datetime, timezone
-from services.db import get_collection
+from tools.db import get_collection
 from utils.helpers import hash_password
 
 class User:

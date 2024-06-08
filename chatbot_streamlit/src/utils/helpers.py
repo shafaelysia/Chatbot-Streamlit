@@ -1,10 +1,6 @@
 import bcrypt
 import streamlit as st
 import pytz
-import os
-import uuid
-
-USER_IMAGE_DIR = "assets/users/"
 
 def hash_password(password):
     salt = bcrypt.gensalt()
@@ -36,6 +32,12 @@ def initialize_session():
     if 'messages' not in st.session_state:
         st.session_state.messages = []
 
+    if 'llm_model' not in st.session_state:
+        st.session_state.llm_model = None
+
+    if 'embedding_model' not in st.session_state:
+        st.session_state.embedding_model = None
+
 def clear_session():
     del st.session_state.is_authenticated
     del st.session_state.role
@@ -44,6 +46,8 @@ def clear_session():
     del st.session_state.user_id
     del st.session_state.chat_session_id
     del st.session_state.messages
+    del st.session_state.llm_model
+    del st.session_state.embedding_model
 
 def check_auth(page):
     if page in ["Login", "Register"]:
@@ -76,35 +80,3 @@ def check_session_states():
 def convert_to_local(utc_dt):
     local_tz = pytz.timezone("YOUR_TIMEZONE")  # e.g., "America/New_York"
     return utc_dt.replace(tzinfo=pytz.utc).astimezone(local_tz)
-
-def save_picture(uploaded_file, username):
-    try:
-        os.makedirs(USER_IMAGE_DIR, exist_ok=True)
-
-        file_extension = uploaded_file.name.split('.')[-1]
-        file_path = os.path.join(USER_IMAGE_DIR, f"{username}.{file_extension}")
-        with open(file_path, "wb") as f:
-            f.write(uploaded_file.getbuffer())
-
-        return file_path
-    except Exception as e:
-        st.error(f"Failed to save picture: {e}")
-        return None
-
-def delete_picture(file_path):
-    try:
-        if os.path.exists(file_path):
-            os.remove(file_path)
-    except Exception as e:
-        st.error(f"Failed to delete picture: {e}")
-
-def update_picture(old_path, new_file, username):
-    delete_picture(old_path)
-    return save_picture(new_file, username)
-
-def display_chat(sender, content):
-    with st.chat_message(sender):
-        st.write(content)
-
-def generate_session_id():
-    return str(uuid.uuid4())

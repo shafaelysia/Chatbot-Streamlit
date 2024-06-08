@@ -1,25 +1,20 @@
 import streamlit as st
 from utils.helpers import initialize_session, check_auth, check_session_states
 from components.sidebar import sidebar
-from services.inference_service import inference_zephyr, get_chat_history
-from utils.helpers import display_chat
-from langchain_core.messages.human import HumanMessage
-from langchain_core.messages.ai import AIMessage
+from tools.chat import display_chat, generate_response, load_llm_model
 import random
 import time
 
 def main():
-    initialize_session()
-
     if check_auth("Home"):
         sidebar()
 
         st.header("Chatbot")
         tab1, tab2= st.tabs(["Chat", "Model Configuration"])
+        #root > div:nth-child(1) > div.withScreencast > div > div > div > section.main.st-emotion-cache-bm2z3a.ea3mdgi8 > div.block-container.st-emotion-cache-1eo1tir.ea3mdgi5 > div > div > div > div.stTabs.st-emotion-cache-0.esjhkag0 > div > div:nth-child(1)
         with tab1:
             for message in st.session_state.messages:
-                with st.chat_message(message["role"]):
-                    st.markdown(message["content"])
+                display_chat(message)
 
         with tab2:
             TEMPERATURE_RANGE = (0.1, 2.0)
@@ -46,20 +41,20 @@ def main():
                     model_config["max_tokens"] = st.slider("Max Tokens", min_value=MAX_TOKENS_RANGE[0], max_value=MAX_TOKENS_RANGE[1], step=100, value=2048)
 
                 with col2:
-                    model_config["model_name"] = st.radio("Choose model", ["mistralai/Mistral-7B-Instruct-v0.3"])
-                st.form_submit_button("Save")
+                    model_config["model_name"] = st.radio("Choose model", ["mistralai/Mistral-7B-Instruct-v0.3", "google/gemma-7b"])
+                if st.form_submit_button("Save"):
+                    with st.spinner("Loading model..."):
+                        st.session_state.llm_model = load_llm_model(model_config)
 
         if prompt := st.chat_input("Send a message"):
             st.session_state.messages.append({"role": "user", "content": prompt})
-            with tab1.chat_message("user"):
-                st.markdown(prompt)
+            with tab1:
+                display_chat({"role": "user", "content": prompt})
 
-            with tab1.chat_message("assistant"):
                 with st.spinner("Thinking..."):
-                    time.sleep(5)
-                    response=response_generator()
-                    st.markdown(response)
-            st.session_state.messages.append({"role": "asssistant", "content": response})
+                    response=generate_response(prompt, model_config)
+                    display_chat({"role": "assistant", "content": response})
+            st.session_state.messages.append({"role": "assistant", "content": response})
     else:
         if not st.session_state.is_authenticated:
             st.warning("You need to log in first!")
@@ -82,5 +77,6 @@ def response_generator():
     return response
 
 if __name__ == "__main__":
+    initialize_session()
     st.set_page_config(page_title="Home", page_icon="", layout="centered")
     main()

@@ -1,9 +1,9 @@
 import streamlit as st
-from utils.helpers import check_password, clear_session, save_picture
-from models.User import User
+from utils.helpers import check_password, clear_session
+from tools.user import get_one_user, create_user, save_picture
 
 def login(username, password):
-    user = User.get_one({"username": username})
+    user = get_one_user({"username": username})
 
     if user is not None and check_password(password, user.password):
         st.session_state.username = user.username
@@ -34,5 +34,5 @@ def register(username, email, password, first_name, last_name, uploaded_file, ro
         "role": role,
         "is_admin": False
     }
-    success, error_message = User.create(user_data)
+    success, error_message = create_user(user_data)
     return success, error_message
