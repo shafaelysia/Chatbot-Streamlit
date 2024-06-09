@@ -57,7 +57,7 @@ def check_auth(page):
             else:
                 st.switch_page("pages/home.py")
     elif page == "Home":
-        if not st.session_state.is_authenticated or st.session_state.is_admin:
+        if not st.session_state.is_authenticated:
             return False
         else:
             return True

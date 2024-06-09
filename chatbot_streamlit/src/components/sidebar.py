@@ -26,6 +26,7 @@ def sidebar():
                 st.session_state.messages = []
                 st.rerun()
 
+            st.markdown("Chat histories")
             for chat in get_all_users_chats({"user_id": st.session_state.user_id}):
                 if st.session_state.chat_session_id == chat["session_id"]:
                     chat_button = st.button(chat["title"], use_container_width=True, type="primary", key=chat["session_id"])
@@ -46,5 +47,6 @@ def sidebar():
             st.divider()
             if st.button("Logout"):
                 logout()
-            if st.button("Dashboard"):
-                st.switch_page("pages/dashboard.py")
+            if st.session_state.is_admin is True:
+                if st.button("Dashboard"):
+                    st.switch_page("pages/dashboard.py")

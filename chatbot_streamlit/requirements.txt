@@ -8,3 +8,4 @@ langchain-mongodb
 langchain-huggingface
 huggingface-hub
 sentence-transformers
+sentencepiece

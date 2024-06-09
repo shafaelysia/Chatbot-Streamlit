@@ -11,7 +11,6 @@ def main():
 
         st.header("Chatbot")
         tab1, tab2= st.tabs(["Chat", "Model Configuration"])
-        #root > div:nth-child(1) > div.withScreencast > div > div > div > section.main.st-emotion-cache-bm2z3a.ea3mdgi8 > div.block-container.st-emotion-cache-1eo1tir.ea3mdgi5 > div > div > div > div.stTabs.st-emotion-cache-0.esjhkag0 > div > div:nth-child(1)
         with tab1:
             for message in st.session_state.messages:
                 display_chat(message)
@@ -41,10 +40,9 @@ def main():
                     model_config["max_tokens"] = st.slider("Max Tokens", min_value=MAX_TOKENS_RANGE[0], max_value=MAX_TOKENS_RANGE[1], step=100, value=2048)
 
                 with col2:
-                    model_config["model_name"] = st.radio("Choose model", ["mistralai/Mistral-7B-Instruct-v0.3", "google/gemma-7b"])
+                    model_config["model_name"] = st.radio("Choose model", ["mistralai/Mistral-7B-Instruct-v0.3", "google/gemma-2b-it", "HuggingFaceH4/zephyr-7b-beta"])
                 if st.form_submit_button("Save"):
-                    with st.spinner("Loading model..."):
-                        st.session_state.llm_model = load_llm_model(model_config)
+                    st.session_state.llm_model = load_llm_model(model_config)
 
         if prompt := st.chat_input("Send a message"):
             st.session_state.messages.append({"role": "user", "content": prompt})

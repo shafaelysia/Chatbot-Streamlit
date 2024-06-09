@@ -4,16 +4,13 @@ from datetime import datetime
 from models.Conversation import Conversation
 from tools.rag import get_retriever
 from langchain_mongodb.chat_message_histories import MongoDBChatMessageHistory
-from langchain_huggingface import HuggingFaceEndpoint, HuggingFaceEmbeddings
+from langchain_huggingface import HuggingFaceEndpoint, HuggingFaceEmbeddings, ChatHuggingFace
 from langchain_core.runnables.history import RunnableWithMessageHistory
-from langchain_core.prompts import MessagesPlaceholder
-from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.prompts import MessagesPlaceholder, ChatPromptTemplate
 from langchain_core.runnables import RunnablePassthrough
 from langchain_core.output_parsers import StrOutputParser
-from langchain_core.messages.human import HumanMessage
-from langchain_core.messages.ai import AIMessage
-import logging
-logging.getLogger().setLevel(logging.ERROR)
+# from langchain_core.messages.human import HumanMessage
+# from langchain_core.messages.ai import AIMessage
 
 def create_chat(chat_data):
     return Conversation.create(chat_data)
@@ -82,7 +79,7 @@ def generate_response_without_history(prompt, model_config):
     retriever = get_retriever(embedding_model)
     retrieve = {"context": retriever | (lambda docs: "\n\n".join([d.page_content for d in docs])), "question": RunnablePassthrough()}
 
-    template = """Kamu adalah chatbot yang bertugas untuk menjawab pertanyaan terkait SMP Santo Leo III. Berikut ini diberikan konteks yang mungkin relevan dengan pertanyaan. Jika relevan jawablah pertanyaan dengan konteks tersebut, jika tidak relevan abaikanlah konteks. Konteks: \
+    template = """Anda adalah chatbot berbahasa Indonesia yang bertugas untuk menjawab pertanyaan terkait SMP Santo Leo III. Berikut ini diberikan konteks yang mungkin relevan dengan pertanyaan. Abaikan konteks jika tidak relevan dengan pertanyaan. Beri tanggapan yang singkat dan komprehensif terhadap pertanyaan pengguna. Konteks: \
     {context}
 
     Pertanyaan: {question}
@@ -93,7 +90,7 @@ def generate_response_without_history(prompt, model_config):
     naive_rag_chain = (
         retrieve
         | final_prompt
-        | llm_model
+        | ChatHuggingFace(llm=llm_model)
         | parse_output
     )
 
@@ -131,7 +128,7 @@ def generate_response_with_history(model_config):
     retriever = get_retriever(embedding_model)
     retriever_chain = RunnablePassthrough.assign(context=question_chain | retriever | (lambda docs: "\n\n".join([d.page_content for d in docs])))
 
-    rag_system_prompt = """Kamu adalah chatbot yang bertugas untuk menjawab pertanyaan terkait SMP Santo Leo III. Berikut ini diberikan konteks yang mungkin relevan dengan pertanyaan. Jika relevan jawablah pertanyaan dengan konteks tersebut, jika tidak relevan abaikanlah konteks. Konteks: \
+    rag_system_prompt = """Anda adalah chatbot berbahasa Indonesia yang bertugas untuk menjawab pertanyaan terkait SMP Santo Leo III. Berikut ini diberikan konteks yang mungkin relevan dengan pertanyaan. Abaikan konteks jika tidak relevan dengan pertanyaan. Beri tanggapan yang singkat dan komprehensif terhadap pertanyaan pengguna. Konteks: \
         {context}
     """
     rag_prompt = ChatPromptTemplate.from_messages(
@@ -144,7 +141,7 @@ def generate_response_with_history(model_config):
     rag_chain = (
         retriever_chain
         | rag_prompt
-        | llm_model
+        | ChatHuggingFace(llm=llm_model)
         | parse_output
     )
 
@@ -188,7 +185,7 @@ def insert_chat_session(session_id, messages):
 
 @st.cache_resource
 def load_llm_model(model_config):
-    if model_config["model_name"] == "mistralai/Mistral-7B-Instruct-v0.3":
+    # if model_config["model_name"] == "mistralai/Mistral-7B-Instruct-v0.3":
         return HuggingFaceEndpoint(
             repo_id=model_config["model_name"],
             streaming=True,
