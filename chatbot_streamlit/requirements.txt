@@ -1,4 +1,5 @@
 streamlit
+streamlit-pdf-viewer
 pymongo
 bcrypt
 pypdf2
@@ -9,3 +10,4 @@ langchain-huggingface
 huggingface-hub
 sentence-transformers
 sentencepiece
+matplotlib

@@ -40,7 +40,7 @@ def main():
                     model_config["max_tokens"] = st.slider("Max Tokens", min_value=MAX_TOKENS_RANGE[0], max_value=MAX_TOKENS_RANGE[1], step=100, value=2048)
 
                 with col2:
-                    model_config["model_name"] = st.radio("Choose model", ["mistralai/Mistral-7B-Instruct-v0.3", "google/gemma-2b-it", "HuggingFaceH4/zephyr-7b-beta"])
+                    model_config["model_name"] = st.radio("Choose model", ["mistralai/Mistral-7B-Instruct-v0.3", "google/gemma-2b-it", "HuggingFaceH4/zephyr-7b-beta", "meta-llama/Meta-Llama-3-8B-Instruct"])
                 if st.form_submit_button("Save"):
                     st.session_state.llm_model = load_llm_model(model_config)
 

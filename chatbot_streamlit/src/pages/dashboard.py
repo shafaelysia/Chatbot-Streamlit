@@ -1,17 +1,31 @@
 import streamlit as st
+from components.users_menu import users_menu
+from components.docs_menu import docs_menu
+from components.llms_menu import llms_menu
 from tools.auth import logout
 from utils.helpers import initialize_session, check_auth, check_session_states
 
 def main():
-    initialize_session()
     if check_auth("Dashboard"):
+        with st.sidebar.container(border=True):
+            if st.button("Home"):
+                st.switch_page("pages/home.py")
+            if st.button("Logout"):
+                logout()
+                st.switch_page("app.py")
 
-        st.title("Dashboard")
-        check_session_states()
+        st.header("Dashboard")
+        tab1, tab2, tab3 = st.tabs(["Users", "Documents", "LLMs"])
 
-        if (st.button("Logout")):
-            logout()
-            st.switch_page("app.py")
+        with tab1:
+            users_menu()
+
+        with tab2:
+            docs_menu()
+
+        with tab3:
+            llms_menu()
+
     else:
         if not st.session_state.is_authenticated:
             st.warning("You need to log in first!")
@@ -23,4 +37,6 @@ def main():
                 st.switch_page("pages/home.py")
 
 if __name__ == "__main__":
+    initialize_session()
+    st.set_page_config(page_title="Dashboard", page_icon="", layout="wide")
     main()
