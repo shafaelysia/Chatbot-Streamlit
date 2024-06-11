@@ -27,6 +27,7 @@ def login(username, password):
         st.session_state.role = user["role"]
         st.session_state.is_admin = user["is_admin"]
         st.session_state.is_authenticated = True
+        st.session_state.profile_picture = user["picture_path"]
         return True
 
     return False

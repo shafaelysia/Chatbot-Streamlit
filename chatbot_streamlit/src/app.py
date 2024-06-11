@@ -5,7 +5,7 @@ from tools.chat import load_llm_model, load_embedding_model
 def main():
     with st.spinner("Please wait..."):
         model_config = {
-                "model_name": "mistralai/Mistral-7B-Instruct-v0.3",
+                "model_name": "meta-llama/Meta-Llama-3-8B-Instruct",
                 "temperature": 1.0,
                 "top_k": 50,
                 "top_p": 0.8,

@@ -1,6 +1,9 @@
+import os
 import bcrypt
 import streamlit as st
 import pytz
+import base64
+import huggingface_hub
 
 def hash_password(password):
     salt = bcrypt.gensalt()
@@ -26,8 +29,14 @@ def initialize_session():
     if 'username' not in st.session_state:
         st.session_state.username = None
 
+    if 'profile_picture' not in st.session_state:
+        st.session_state.profile_picture = None
+
     if 'chat_session_id' not in st.session_state:
         st.session_state.chat_session_id = None
+
+    if 'chat_title' not in st.session_state:
+        st.session_state.chat_title = None
 
     if 'messages' not in st.session_state:
         st.session_state.messages = []
@@ -43,6 +52,7 @@ def clear_session():
     del st.session_state.role
     del st.session_state.is_admin
     del st.session_state.username
+    del st.session_state.profile_picture
     del st.session_state.user_id
     del st.session_state.chat_session_id
     del st.session_state.messages
@@ -80,3 +90,15 @@ def check_session_states():
 def convert_to_local(utc_dt):
     local_tz = pytz.timezone("YOUR_TIMEZONE")  # e.g., "America/New_York"
     return utc_dt.replace(tzinfo=pytz.utc).astimezone(local_tz)
+
+def authorize_hf():
+    huggingface_hub.login(st.secrets.hf.HUGGINGFACEHUB_API_TOKEN)
+
+def convert_image_to_base64(filename):
+    try:
+        path = os.path.join("assets/users", filename)
+        with open(path, "rb") as image_file:
+            encoded_string = base64.b64encode(image_file.read()).decode()
+            return f"data:image/png;base64,{encoded_string}"
+    except Exception as e:
+        return ""

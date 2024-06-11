@@ -1,9 +1,9 @@
-import base64
 import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
 from datetime import datetime, timezone
 from tools.user import get_all_users, get_one_user, create_user, update_user, delete_user
+from utils.helpers import convert_image_to_base64
 
 def users_menu():
     users = get_all_users()
@@ -92,14 +92,6 @@ def users_menu():
     #         ax1.axis('equal')
     #         st.pyplot(fig1)
 
-
-def convert_image_to_base64(path: str):
-    try:
-        with open(path, "rb") as image_file:
-            encoded_string = base64.b64encode(image_file.read()).decode()
-            return f"data:image/png;base64,{encoded_string}"
-    except Exception as e:
-        return ""
 
 @st.experimental_dialog("User Details", width="large")
 def details_modal(username):

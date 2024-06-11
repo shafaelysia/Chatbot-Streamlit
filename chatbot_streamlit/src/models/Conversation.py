@@ -53,9 +53,9 @@ class Conversation:
     def get_user_chats(cls, criteria):
         try:
             conversations_collection = get_collection("conversations")
-            return conversations_collection.find(criteria)
+            return conversations_collection.find(criteria).sort("updated_at", -1)
         except Exception as e:
-            raise Exception("Failed to get all user's chats!") from e
+            raise Exception(f"Failed to get all user's chats! Error: {e}") from e
 
     @classmethod
     def get_all_with_history(cls):

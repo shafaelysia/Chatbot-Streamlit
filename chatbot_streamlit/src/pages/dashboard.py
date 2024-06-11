@@ -4,15 +4,23 @@ from components.docs_menu import docs_menu
 from components.llms_menu import llms_menu
 from tools.auth import logout
 from utils.helpers import initialize_session, check_auth, check_session_states
+from components.profile_modal import profile_modal
 
 def main():
     if check_auth("Dashboard"):
-        with st.sidebar.container(border=True):
-            if st.button("Home"):
-                st.switch_page("pages/home.py")
-            if st.button("Logout"):
-                logout()
-                st.switch_page("app.py")
+        with st.sidebar:
+            with st.container(border=False):
+                st.image("assets/LOGO.PNG")
+            with st.container(border=False):
+                st.divider()
+                with st.popover("Settings", use_container_width=True):
+                    if st.button("Account Details", use_container_width=True):
+                        profile_modal(st.session_state.username)
+                    if st.session_state.is_admin is True:
+                        if st.button("Home", use_container_width=True):
+                            st.switch_page("pages/home.py")
+                    if st.button("Logout", use_container_width=True):
+                        logout()
 
         st.header("Dashboard")
         tab1, tab2, tab3 = st.tabs(["Users", "Documents", "LLMs"])

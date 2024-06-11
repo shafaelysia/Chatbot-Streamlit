@@ -1,7 +1,7 @@
 import streamlit as st
 from utils.helpers import initialize_session, check_auth, check_session_states
 from components.sidebar import sidebar
-from tools.chat import display_chat, generate_response, load_llm_model
+from tools.chat import display_chat, generate_response, load_llm_model, update_chat_title
 import random
 import time
 
@@ -9,7 +9,20 @@ def main():
     if check_auth("Home"):
         sidebar()
 
-        st.header("Chatbot")
+        if st.session_state.chat_title is not None:
+            title_col1, title_col2 = st.columns([0.8, 0.2])
+            with title_col1:
+                st.markdown("### " + st.session_state.chat_title)
+            with title_col2:
+                with st.popover("Edit title"):
+                    with st.form("edit", clear_on_submit=True):
+                        new_title = st.text_input("New Title")
+                        if st.form_submit_button("Submit"):
+                            update_chat_title({"session_id": st.session_state.chat_session_id}, new_title)
+                            st.session_state.chat_title = new_title
+                            st.rerun()
+        else:
+            st.markdown("### New Chat")
         tab1, tab2= st.tabs(["Chat", "Model Configuration"])
         with tab1:
             for message in st.session_state.messages:
@@ -22,7 +35,7 @@ def main():
             REPETITION_PENALTY_RANGE = (1.0, 2.0)
             MAX_TOKENS_RANGE = (100, 5000)
             model_config = {
-                "model_name": "mistralai/Mistral-7B-Instruct-v0.3",
+                "model_name": "meta-llama/Meta-Llama-3-8B-Instruct",
                 "temperature": 1.0,
                 "top_k": 50,
                 "top_p": 0.8,
@@ -40,7 +53,7 @@ def main():
                     model_config["max_tokens"] = st.slider("Max Tokens", min_value=MAX_TOKENS_RANGE[0], max_value=MAX_TOKENS_RANGE[1], step=100, value=2048)
 
                 with col2:
-                    model_config["model_name"] = st.radio("Choose model", ["mistralai/Mistral-7B-Instruct-v0.3", "google/gemma-2b-it", "HuggingFaceH4/zephyr-7b-beta", "meta-llama/Meta-Llama-3-8B-Instruct"])
+                    model_config["model_name"] = st.radio("Choose model", ["meta-llama/Meta-Llama-3-8B-Instruct", "mistralai/Mistral-7B-Instruct-v0.3", "HuggingFaceH4/zephyr-7b-beta"])
                 if st.form_submit_button("Save"):
                     st.session_state.llm_model = load_llm_model(model_config)
 
@@ -53,6 +66,8 @@ def main():
                     response=generate_response(prompt, model_config)
                     display_chat({"role": "assistant", "content": response})
             st.session_state.messages.append({"role": "assistant", "content": response})
+            st.session_state.chat_title = prompt
+
     else:
         if not st.session_state.is_authenticated:
             st.warning("You need to log in first!")

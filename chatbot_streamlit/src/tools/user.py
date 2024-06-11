@@ -19,10 +19,9 @@ def get_all_users():
     return User.get_all()
 
 def update_user(criteria, new_data, old_data):
-    if old_data["picture_path"] != "" and old_data["picture_path"] is not None:
-        if new_data["picture_path"] != old_data["picture_path"]:
-            picture_path = update_picture(old_data["picture_path"], new_data["picture_path"], new_data["username"])
-            new_data["picture_path"] = picture_path
+    if new_data["picture_path"] != old_data["picture_path"] and new_data["picture_path"] is not None:
+        picture_path = update_picture(old_data["picture_path"], new_data["picture_path"], new_data["username"])
+        new_data["picture_path"] = picture_path
     return User.update(criteria, new_data)
 
 def partial_update_user(criteria, user_data):
@@ -61,5 +60,6 @@ def delete_picture(filename):
         st.error(f"Failed to delete picture: {e}")
 
 def update_picture(old_path, new_file, username):
-    delete_picture(old_path)
+    if old_path is not None or old_path != "":
+        delete_picture(old_path)
     return save_picture(new_file, username)

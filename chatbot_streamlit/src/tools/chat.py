@@ -1,16 +1,16 @@
+import os
 import uuid
 import streamlit as st
-from datetime import datetime
-from models.Conversation import Conversation
-from tools.rag import get_retriever
+from datetime import datetime, timezone
 from langchain_mongodb.chat_message_histories import MongoDBChatMessageHistory
-from langchain_huggingface import HuggingFaceEndpoint, HuggingFaceEmbeddings, ChatHuggingFace
+from langchain_huggingface import HuggingFaceEndpoint, HuggingFaceEmbeddings, ChatHuggingFace, HuggingFacePipeline
 from langchain_core.runnables.history import RunnableWithMessageHistory
 from langchain_core.prompts import MessagesPlaceholder, ChatPromptTemplate
 from langchain_core.runnables import RunnablePassthrough
 from langchain_core.output_parsers import StrOutputParser
-# from langchain_core.messages.human import HumanMessage
-# from langchain_core.messages.ai import AIMessage
+from models.Conversation import Conversation
+from tools.rag import get_retriever
+from utils.helpers import convert_image_to_base64
 
 def create_chat(chat_data):
     return Conversation.create(chat_data)
@@ -39,7 +39,10 @@ def generate_session_id():
     return str(uuid.uuid4())
 
 def display_chat(message):
-    return st.chat_message(message["role"]).markdown(message["content"])
+    if (message["role"] == "user") and st.session_state.profile_picture not in [None, ""]:
+        return st.chat_message(message["role"], avatar=convert_image_to_base64(st.session_state.profile_picture)).markdown(message["content"])
+    else:
+        return st.chat_message(message["role"]).markdown(message["content"])
 
 def generate_response(prompt, model_config):
     if st.session_state.chat_session_id is None:
@@ -49,7 +52,6 @@ def generate_response(prompt, model_config):
     else:
         chain, session_id = generate_response_with_history(model_config)
         response = chain.invoke({"question": prompt}, {"configurable": {"session_id": session_id}})
-
     return response
 
 def generate_response_without_history(prompt, model_config):
@@ -61,8 +63,8 @@ def generate_response_without_history(prompt, model_config):
             "user_id": st.session_state.user_id,
             "title": prompt,
             "session_id": session_id,
-            "created_at": datetime.utcnow(),
-            "updated_at": datetime.utcnow(),
+            "created_at": datetime.now(timezone.utc),
+            "updated_at": datetime.now(timezone.utc),
         }
         create_chat(chat_data)
 
@@ -79,7 +81,7 @@ def generate_response_without_history(prompt, model_config):
     retriever = get_retriever(embedding_model)
     retrieve = {"context": retriever | (lambda docs: "\n\n".join([d.page_content for d in docs])), "question": RunnablePassthrough()}
 
-    template = """Anda adalah chatbot yang bertugas untuk menjawab pertanyaan terkait SMP Santo Leo III. Berikut ini diberikan konteks yang mungkin relevan dengan pertanyaan. Abaikan konteks jika tidak relevan dengan pertanyaan. Beri tanggapan yang singkat dan komprehensif terhadap pertanyaan pengguna. Konteks: \
+    template = """Anda adalah chatbot yang bertugas untuk menjawab pertanyaan terkait SMP Santo Leo III. Berikut ini diberikan konteks yang mungkin relevan dengan pertanyaan. Abaikan konteks jika tidak relevan dengan pertanyaan. Beri tanggapan yang singkat dan komprehensif terhadap pertanyaan pengguna dan jangan katakan kepada pengguna bahwa Anda menerima konteks. Konteks: \
     {context}
 
     Pertanyaan: {question}
@@ -128,7 +130,7 @@ def generate_response_with_history(model_config):
     retriever = get_retriever(embedding_model)
     retriever_chain = RunnablePassthrough.assign(context=question_chain | retriever | (lambda docs: "\n\n".join([d.page_content for d in docs])))
 
-    rag_system_prompt = """Anda adalah chatbot yang bertugas untuk menjawab pertanyaan terkait SMP Santo Leo III. Berikut ini diberikan konteks yang mungkin relevan dengan pertanyaan. Abaikan konteks jika tidak relevan dengan pertanyaan. Beri tanggapan yang singkat dan komprehensif terhadap pertanyaan pengguna. Konteks: \
+    rag_system_prompt = """Anda adalah chatbot yang bertugas untuk menjawab pertanyaan terkait SMP Santo Leo III. Berikut ini diberikan konteks yang mungkin relevan dengan pertanyaan. Abaikan konteks jika tidak relevan dengan pertanyaan. Beri tanggapan yang singkat dan komprehensif terhadap pertanyaan pengguna dan jangan katakan kepada pengguna bahwa Anda menerima konteks. Konteks: \
         {context}
     """
     rag_prompt = ChatPromptTemplate.from_messages(
@@ -185,17 +187,16 @@ def insert_chat_session(session_id, messages):
 
 @st.cache_resource
 def load_llm_model(model_config):
-    # if model_config["model_name"] == "mistralai/Mistral-7B-Instruct-v0.3":
-        return HuggingFaceEndpoint(
-            repo_id=model_config["model_name"],
-            streaming=True,
-            max_new_tokens=512,
-            temperature=model_config["temperature"],
-            top_k=model_config["top_k"],
-            top_p=model_config["top_p"],
-            repetition_penalty=model_config["repetition_penalty"],
-            huggingfacehub_api_token=st.secrets.hf.HUGGINGFACEHUB_API_TOKEN,
-        )
+    return HuggingFaceEndpoint(
+        repo_id=model_config["model_name"],
+        streaming=True,
+        max_new_tokens=model_config["max_tokens"],
+        temperature=model_config["temperature"],
+        top_k=model_config["top_k"],
+        top_p=model_config["top_p"],
+        repetition_penalty=model_config["repetition_penalty"],
+        huggingfacehub_api_token=st.secrets.hf.HUGGINGFACEHUB_API_TOKEN,
+    )
 
 @st.cache_resource
 def load_embedding_model(model_name):
