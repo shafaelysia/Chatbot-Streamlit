@@ -10,7 +10,7 @@ def main():
     if check_auth("Dashboard"):
         with st.sidebar:
             with st.container(border=False):
-                st.image("assets/LOGO.PNG")
+                st.image("assets/logo.png")
             with st.container(border=False):
                 st.divider()
                 with st.popover("Settings", use_container_width=True):
