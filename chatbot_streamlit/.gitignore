@@ -1,10 +1,11 @@
 .venv/
-.streamlit/
 __pycache__/
 
 assets/users/*
 assets/pdfs/*
 assets/json/*
+
+secrets.toml
 
 *.xls
 *.xlsx
