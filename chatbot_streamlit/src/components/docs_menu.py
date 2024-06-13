@@ -17,11 +17,12 @@ def docs_menu():
         if dir_list:
             dir_data_list = []
             for i, dir in enumerate(dir_list, start=1):
-                file = {
-                    "No": i,
-                    "File Name": dir,
-                }
-                dir_data_list.append(file)
+                if dir.endswith(".pdf"):
+                    file = {
+                        "No": i,
+                        "File Name": dir,
+                    }
+                    dir_data_list.append(file)
 
             with docs_col1.container():
                 st.subheader("PDFs List")
@@ -44,7 +45,7 @@ def docs_menu():
                         delete_pdf(filename)
                         st.cache_data.clear()
                         st.rerun()
-                    with st.container(border=True):
+                    with st.container(border=True, height=500):
                         pdf_preview(filename, pdf_path)
 
         else:
@@ -66,11 +67,12 @@ def docs_menu():
         if json_list:
             json_data_list = []
             for i, dir in enumerate(json_list, start=1):
-                file = {
-                    "No": i,
-                    "File Name": dir,
-                }
-                json_data_list.append(file)
+                if dir.endswith(".json"):
+                    file = {
+                        "No": i,
+                        "File Name": dir,
+                    }
+                    json_data_list.append(file)
 
             with json_col1.container():
                 st.subheader("JSON List")

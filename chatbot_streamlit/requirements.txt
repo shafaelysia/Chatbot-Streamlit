@@ -10,5 +10,4 @@ langchain-huggingface==0.0.3
 huggingface-hub==0.23.3
 sentence-transformers==3.0.1
 sentencepiece==0.2.0
-matplotlib==3.9.0
 datasets==2.19.2

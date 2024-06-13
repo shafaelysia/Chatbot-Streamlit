@@ -1,4 +1,13 @@
 .venv/
 .streamlit/
 __pycache__/
-assets/
+
+assets/users/*
+assets/pdfs/*
+assets/json/*
+
+*.xls
+*.xlsx
+*.csv
+
+!.gitkeep

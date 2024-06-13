@@ -1,5 +1,4 @@
 import streamlit as st
-from PIL import Image
 from components.profile_modal import profile_modal
 from tools.auth import logout
 from tools.chat import get_all_users_chats, get_chat_history_by_session
@@ -9,7 +8,7 @@ from langchain_core.messages.ai import AIMessage
 def sidebar():
     with st.sidebar:
         with st.container(border=False):
-            st.image("assets/LOGO.PNG")
+            st.image("assets/logo.png")
             if st.session_state.chat_session_id is None:
                 new_chat_button = st.button("New Chat", use_container_width=True, type="primary")
             else:
@@ -21,7 +20,7 @@ def sidebar():
                 st.rerun()
 
         with st.container(height=250, border=False):
-            st.markdown("History")
+            st.markdown("## History")
             for chat in get_all_users_chats({"user_id": st.session_state.user_id}):
                 if st.session_state.chat_session_id == chat["session_id"]:
                     chat_button = st.button(chat["title"], use_container_width=True, type="primary", key=chat["session_id"])

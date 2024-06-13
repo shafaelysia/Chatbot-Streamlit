@@ -5,21 +5,24 @@ from tools.user import get_one_user, create_user, save_picture, update_user
 
 def login(username, password):
     user = get_one_user({"username": username})
-    user_data = {
-        "username": username,
-        "email": user["email"],
-        "password": user["password"],
-        "first_name": user["first_name"],
-        "last_name": user["last_name"],
-        "picture_path": user["picture_path"],
-        "role": user["role"],
-        "is_admin": user["is_admin"],
-        "created_at": user["created_at"],
-        "updated_at": user["updated_at"],
-        "is_active": True,
-        "last_login": user["last_login"]
-    }
-    update_user({"username": username}, user_data, user)
+    if user:
+        user_data = {
+            "username": username,
+            "email": user["email"],
+            "password": user["password"],
+            "first_name": user["first_name"],
+            "last_name": user["last_name"],
+            "picture_path": user["picture_path"],
+            "role": user["role"],
+            "is_admin": user["is_admin"],
+            "created_at": user["created_at"],
+            "updated_at": user["updated_at"],
+            "is_active": True,
+            "last_login": user["last_login"]
+        }
+        update_user({"username": username}, user_data)
+    else:
+        return False
 
     if user is not None and check_password(password, user["password"]):
         st.session_state.username = user["username"]
@@ -34,24 +37,24 @@ def login(username, password):
 
 def logout():
     user = get_one_user({"username": st.session_state.username})
-    user_data = {
-        "username": user["username"],
-        "email": user["email"],
-        "password": user["password"],
-        "first_name": user["first_name"],
-        "last_name": user["last_name"],
-        "picture_path": user["picture_path"],
-        "role": user["role"],
-        "is_admin": user["is_admin"],
-        "created_at": user["created_at"],
-        "updated_at": user["updated_at"],
-        "is_active": False,
-        "last_login": datetime.now(timezone.utc)
-    }
-    update_user({"username": st.session_state.username}, user, user_data)
-
-    clear_session()
-    st.switch_page("app.py")
+    if user:
+        user_data = {
+            "username": user["username"],
+            "email": user["email"],
+            "password": user["password"],
+            "first_name": user["first_name"],
+            "last_name": user["last_name"],
+            "picture_path": user["picture_path"],
+            "role": user["role"],
+            "is_admin": user["is_admin"],
+            "created_at": user["created_at"],
+            "updated_at": user["updated_at"],
+            "is_active": False,
+            "last_login": datetime.now(timezone.utc)
+        }
+        update_user({"username": st.session_state.username}, user_data)
+        clear_session()
+        st.switch_page("app.py")
 
 def register(username, email, password, first_name, last_name, uploaded_file, role):
     picture_path = ""

@@ -86,14 +86,6 @@ class User:
             raise Exception("Failed to update user!") from e
 
     @classmethod
-    def partial_update(cls, criteria, new_data):
-        try:
-            users_collection = get_collection("users")
-            users_collection.update_one(criteria, {"$set": new_data})
-        except Exception as e:
-            raise Exception("Failed to update user!") from e
-
-    @classmethod
     def delete(cls, criteria):
         try:
             users_collection = get_collection("users")

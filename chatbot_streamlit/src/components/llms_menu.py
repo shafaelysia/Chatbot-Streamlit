@@ -1,3 +1,4 @@
+import os
 import streamlit as st
 from tools.evaluations.evaluation import evaluate_chatbot
 from tools.chat import load_llm_model
@@ -34,7 +35,11 @@ def llms_menu():
 
     st.subheader("Model Evaluation")
     if st.button("Evaluate Model Performance", type="primary"):
-       if evaluate_chatbot(model_config):
-           st.success("Model evaluation successful!")
-       else:
-           st.error("Model evaluation unsuccessful!")
+        csv = evaluate_chatbot(model_config)
+        if csv:
+            st.success("Model evaluation successful!")
+            file_path = os.path.join("tools/evaluatioins", csv)
+            with open(file_path, "rb") as f:
+                st.download_button("Download CSV", data=f, file_name="evaluation_result.csv")
+        else:
+            st.error("Model evaluation unsuccessful!")

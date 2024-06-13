@@ -1,6 +1,7 @@
 import os
 import streamlit as st
 from models.User import User
+from utils.helpers import hash_password, check_password
 
 USER_IMAGE_DIR = "../../assets/users"
 
@@ -18,19 +19,31 @@ def get_one_user(criteria):
 def get_all_users():
     return User.get_all()
 
-def update_user(criteria, new_data, old_data):
-    if new_data["picture_path"] != old_data["picture_path"] and new_data["picture_path"] is not None:
-        picture_path = update_picture(old_data["picture_path"], new_data["picture_path"], new_data["username"])
-        new_data["picture_path"] = picture_path
+def update_user(criteria, new_data):
     return User.update(criteria, new_data)
-
-def partial_update_user(criteria, user_data):
-    return User.partial_update(criteria, user_data)
 
 def delete_user(criteria, user_data):
     if (user_data["picture_path"] != "" and user_data["picture_path"] is not None):
         delete_picture(user_data["picture_path"])
     return User.delete(criteria)
+
+def change_password(user_data, old_password, new_password):
+    if check_password(old_password, user_data["password"]):
+        hashed_password = hash_password(new_password)
+        user_data["password"] = hashed_password
+        return update_user({"username": user_data["username"]}, user_data)
+    else:
+        return False
+
+def change_picture(uploaded_file, user_data):
+    picture_path = update_picture(user_data["picture_path"], uploaded_file, user_data["username"])
+    user_data["picture_path"] = picture_path
+    return update_user({"username": user_data["username"]}, user_data)
+
+def remove_picture(user_data):
+    delete_picture(user_data["picture_path"])
+    user_data["picture_path"] = None
+    return update_user({"username": user_data["username"]}, user_data)
 
 def save_picture(uploaded_file, username):
     try:
@@ -60,6 +73,6 @@ def delete_picture(filename):
         st.error(f"Failed to delete picture: {e}")
 
 def update_picture(old_path, new_file, username):
-    if old_path is not None or old_path != "":
+    if old_path is not None and old_path != "":
         delete_picture(old_path)
     return save_picture(new_file, username)

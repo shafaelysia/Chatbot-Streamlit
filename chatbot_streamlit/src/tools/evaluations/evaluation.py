@@ -49,7 +49,7 @@ def load_and_extract_conversations(dataset_name):
     return questions, answers
 
 def save_results(results, model_config):
-    filename = "evaluation_results_" + datetime.now(timezone.utc).strftime('%Y-%m-%d_%H-%M-%S') + ".csv"
+    filename = "evaluation_results/evaluation_results_" + datetime.now(timezone.utc).strftime('%Y-%m-%d_%H-%M-%S') + ".csv"
     current_dir = os.path.dirname(os.path.abspath(__file__))
     file_path = os.path.join(current_dir, filename)
 
@@ -71,7 +71,7 @@ def save_results(results, model_config):
         writer.writerow({"Question": "Date", "Response": datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S')})
 
     logging.info(f"Evaluation results saved to {file_path}")
-    return file_path
+    return filename
 
 def simulate_response(prompt, model_config):
     logging.info("Simulating response for the prompt.")
