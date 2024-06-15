@@ -47,6 +47,9 @@ def initialize_session():
     if 'embedding_model' not in st.session_state:
         st.session_state.embedding_model = None
 
+    if 'user_preview_id' not in st.session_state:
+        st.session_state.user_preview_id = None
+
 def clear_session():
     del st.session_state.is_authenticated
     del st.session_state.role
@@ -58,6 +61,7 @@ def clear_session():
     del st.session_state.messages
     del st.session_state.llm_model
     del st.session_state.embedding_model
+    del st.session_state.user_preview_id
 
 def check_auth(page):
     if page in ["Login", "Register"]:

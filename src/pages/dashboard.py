@@ -1,5 +1,6 @@
 import streamlit as st
 from components.users_menu import users_menu
+from components.conversations_menu import conversations_menu
 from components.docs_menu import docs_menu
 from components.llms_menu import llms_menu
 from tools.auth import logout
@@ -23,15 +24,18 @@ def main():
                         logout()
 
         st.header("Dashboard")
-        tab1, tab2, tab3 = st.tabs(["Users", "Documents", "LLMs"])
+        tab1, tab2, tab3, tab4 = st.tabs(["Users", "Conversations", "Documents", "LLMs"])
 
         with tab1:
             users_menu()
 
         with tab2:
-            docs_menu()
+            conversations_menu()
 
         with tab3:
+            docs_menu()
+
+        with tab4:
             llms_menu()
 
     else:

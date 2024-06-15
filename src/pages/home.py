@@ -73,10 +73,6 @@ def main():
             st.warning("You need to log in first!")
             if st.button("Back"):
                 st.switch_page("app.py")
-        elif st.session_state.is_admin:
-            st.warning("You need to log in as user!")
-            if st.button("Back"):
-                st.switch_page("pages/dashboard.py")
 
 def response_generator():
     time.sleep(3)

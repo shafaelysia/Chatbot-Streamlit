@@ -81,7 +81,7 @@ def generate_response_without_history(prompt, model_config):
     retriever = get_retriever(embedding_model)
     retrieve = {"context": retriever | (lambda docs: "\n\n".join([d.page_content for d in docs])), "question": RunnablePassthrough()}
 
-    template = """Anda adalah chatbot yang bertugas untuk menjawab pertanyaan terkait SMP Santo Leo III. Berikut ini diberikan konteks yang mungkin relevan dengan pertanyaan. Abaikan konteks jika tidak relevan dengan pertanyaan. Beri tanggapan yang singkat dan komprehensif terhadap pertanyaan pengguna dan jangan katakan kepada pengguna bahwa Anda menerima konteks. Konteks: \
+    template = """Anda adalah chatbot berbahasa Indonesia yang bertugas untuk menjawab pertanyaan terkait SMP Santo Leo III. Berikut ini diberikan konteks yang mungkin relevan dengan pertanyaan. Abaikan konteks jika tidak relevan dengan pertanyaan. Beri tanggapan yang singkat dan komprehensif terhadap pertanyaan pengguna dan jangan katakan kepada pengguna bahwa Anda menerima konteks. Konteks: \
     {context}
 
     Pertanyaan: {question}
@@ -130,7 +130,7 @@ def generate_response_with_history(model_config):
     retriever = get_retriever(embedding_model)
     retriever_chain = RunnablePassthrough.assign(context=question_chain | retriever | (lambda docs: "\n\n".join([d.page_content for d in docs])))
 
-    rag_system_prompt = """Anda adalah chatbot yang bertugas untuk menjawab pertanyaan terkait SMP Santo Leo III. Berikut ini diberikan konteks yang mungkin relevan dengan pertanyaan. Abaikan konteks jika tidak relevan dengan pertanyaan. Beri tanggapan yang singkat dan komprehensif terhadap pertanyaan pengguna dan jangan katakan kepada pengguna bahwa Anda menerima konteks. Konteks: \
+    rag_system_prompt = """Anda adalah chatbot berbahasa Indonesia yang bertugas untuk menjawab pertanyaan terkait SMP Santo Leo III. Berikut ini diberikan konteks yang mungkin relevan dengan pertanyaan. Abaikan konteks jika tidak relevan dengan pertanyaan. Beri tanggapan yang singkat dan komprehensif terhadap pertanyaan pengguna dan jangan katakan kepada pengguna bahwa Anda menerima konteks. Konteks: \
         {context}
     """
     rag_prompt = ChatPromptTemplate.from_messages(
