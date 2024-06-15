@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 from datetime import datetime, timezone
 from tools.user import get_all_users, get_one_user, create_user, update_user, delete_user, change_password, change_picture, remove_picture
-from utils.helpers import convert_image_to_base64
+from utils.helpers import convert_image_to_base64, convert_to_local
 
 def users_menu():
     users = get_all_users()
@@ -17,9 +17,9 @@ def users_menu():
                 "Role": user["role"],
                 "Picture": convert_image_to_base64(user["picture_path"]) if user["picture_path"] !=  "" else user["picture_path"],
                 "Administrator": user["is_admin"],
-                "Join Date": user["created_at"],
-                "Update Date": user["updated_at"],
-                "Last Login": user["last_login"],
+                "Join Date": convert_to_local(user["created_at"]) if user["created_at"] is not None else None,
+                "Update Date": convert_to_local(user["updated_at"]) if user["updated_at"] is not None else None,
+                "Last Login": convert_to_local(user["last_login"]) if user["last_login"] is not None else None,
                 "Active": user["is_active"]
             }
             user_data_list.append(user_data)
@@ -62,10 +62,6 @@ def users_menu():
         with sub_col1:
             if st.button("Add new user", type="primary"):
                 add_modal()
-        with sub_col2:
-            if st.button("Refresh table"):
-                st.cache_data.clear()
-                st.rerun()
 
         if len(user_event.selection['rows']):
             selected_row = user_event.selection['rows'][0]
@@ -117,7 +113,7 @@ def details_modal(username):
 
             admin = st.toggle("Administrator Privileges", value=user_data["is_admin"])
 
-            btn_col1, btn_col2, btn_col3 = st.columns(3)
+            btn_col1, btn_col2, btn_col3 = st.columns([0.4, 0.3, 0.3])
             with btn_col1:
                 with st.popover("Change Password", use_container_width=True):
                     old_password = st.text_input("Old Password", type="password")
@@ -166,27 +162,31 @@ def add_modal():
         username = st.text_input("Username*")
         email = st.text_input("Email*")
         password = st.text_input("Password*", type="password")
-        role = st.selectbox("Role*", ("Student", "Parent", "Teacher/Staff"))
+        role = st.selectbox("Role*", ("Student", "Parent", "Teacher/Staff", "Other"))
         uploaded_file = st.file_uploader("Upload profile picture (optional)", ["jpg", "jpeg", "png"])
         admin = st.toggle("Administrator Privileges")
+        st.html("<br/>")
 
-        if st.form_submit_button("Submit", type="primary"):
-            if not first_name or not last_name or not username or not email or not password or not role:
-                st.warning("Please fill out all required fields.")
-            else:
-                user_data = {
-                    "username": username,
-                    "email": email,
-                    "password": password,
-                    "first_name": first_name,
-                    "last_name": last_name,
-                    "picture_path": uploaded_file if uploaded_file else None,
-                    "role": role,
-                    "is_admin": admin,
-                }
-                success, error_message = create_user(user_data)
-                if success:
-                    st.success("Successfully created new user!")
-                    st.rerun()
+        btn_col1, btn_col2, btn_col3 = st.columns(3)
+        with btn_col2:
+            if st.form_submit_button("Create User", type="primary", use_container_width=True):
+                if not first_name or not last_name or not username or not email or not password or not role:
+                    st.warning("Please fill out all required fields.")
                 else:
-                    st.warning(error_message if error_message else "Failed in creating new user!")
+                    user_data = {
+                        "username": username,
+                        "email": email,
+                        "password": password,
+                        "first_name": first_name,
+                        "last_name": last_name,
+                        "picture_path": uploaded_file if uploaded_file else None,
+                        "role": role,
+                        "is_admin": admin,
+                    }
+                    success, error_message = create_user(user_data)
+                    if success:
+                        st.success("Successfully created new user!")
+                        st.cache_data.clear()
+                        st.rerun()
+                    else:
+                        st.warning(error_message if error_message else "Failed in creating new user!")

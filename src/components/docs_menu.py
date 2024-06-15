@@ -16,10 +16,12 @@ def docs_menu():
 
         if dir_list:
             dir_data_list = []
-            for i, dir in enumerate(dir_list, start=1):
+            pdf_no = 0
+            for dir in dir_list:
                 if dir.endswith(".pdf"):
+                    pdf_no += 1
                     file = {
-                        "No": i,
+                        "No": pdf_no,
                         "File Name": dir,
                     }
                     dir_data_list.append(file)
@@ -47,6 +49,9 @@ def docs_menu():
                         st.rerun()
                     with st.container(border=True, height=500):
                         pdf_preview(filename, pdf_path)
+                else:
+                    with st.container(border=True, height=500):
+                        st.html("<center>No PDF selected yet.</center>")
 
         else:
             st.write("No documents found.")
@@ -66,10 +71,12 @@ def docs_menu():
 
         if json_list:
             json_data_list = []
-            for i, dir in enumerate(json_list, start=1):
+            json_no = 0
+            for dir in json_list:
                 if dir.endswith(".json"):
+                    json_no += 1
                     file = {
-                        "No": i,
+                        "No": json_no,
                         "File Name": dir,
                     }
                     json_data_list.append(file)
@@ -98,6 +105,9 @@ def docs_menu():
                     with st.container(border=True, height=300):
                         json_file = open_json(filename, json_path)
                         st.json(json_file)
+                else:
+                    with st.container(border=True, height=300):
+                        st.html("<center>No JSON selected yet.</center>")
 
         else:
             st.write("No documents found.")

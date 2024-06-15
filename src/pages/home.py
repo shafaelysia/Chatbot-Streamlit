@@ -87,5 +87,5 @@ def response_generator():
 
 if __name__ == "__main__":
     initialize_session()
-    st.set_page_config(page_title="Home", page_icon="", layout="centered")
+    st.set_page_config(page_title="Home", page_icon="assets/icon.jpeg", layout="centered")
     main()

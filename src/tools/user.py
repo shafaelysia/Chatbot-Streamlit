@@ -11,11 +11,11 @@ def create_user(user_data):
         user_data["picture_path"] = picture_path
     return User.create(user_data)
 
-@st.cache_data
+@st.cache_data(show_spinner=False)
 def get_one_user(criteria):
     return User.get_one(criteria)
 
-@st.cache_data
+@st.cache_data(show_spinner=False)
 def get_all_users():
     return User.get_all()
 

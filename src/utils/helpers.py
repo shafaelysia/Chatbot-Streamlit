@@ -92,7 +92,7 @@ def check_session_states():
     st.write("chat_session_id:  " + str(st.session_state.chat_session_id))
 
 def convert_to_local(utc_dt):
-    local_tz = pytz.timezone("YOUR_TIMEZONE")  # e.g., "America/New_York"
+    local_tz = pytz.timezone("Asia/Jakarta")
     return utc_dt.replace(tzinfo=pytz.utc).astimezone(local_tz)
 
 def authorize_hf():

@@ -15,14 +15,14 @@ from utils.helpers import convert_image_to_base64
 def create_chat(chat_data):
     return Conversation.create(chat_data)
 
-@st.cache_data
+@st.cache_data(show_spinner=False)
 def get_one_chat(criteria):
     return Conversation.get_one(criteria)
 
 def get_all_users_chats(criteria):
     return list(Conversation.get_user_chats(criteria))
 
-@st.cache_data
+@st.cache_data(show_spinner=False)
 def get_all_chats_with_history():
     pass
 
@@ -81,7 +81,7 @@ def generate_response_without_history(prompt, model_config):
     retriever = get_retriever(embedding_model)
     retrieve = {"context": retriever | (lambda docs: "\n\n".join([d.page_content for d in docs])), "question": RunnablePassthrough()}
 
-    template = """Anda adalah chatbot berbahasa Indonesia yang bertugas untuk menjawab pertanyaan terkait SMP Santo Leo III. Berikut ini diberikan konteks yang mungkin relevan dengan pertanyaan. Abaikan konteks jika tidak relevan dengan pertanyaan. Beri tanggapan yang singkat dan komprehensif terhadap pertanyaan pengguna dan jangan katakan kepada pengguna bahwa Anda menerima konteks. Konteks: \
+    template = """Anda adalah chatbot berbahasa Indonesia yang bertugas untuk menjawab pertanyaan terkait SMP Santo Leo III. Berikut ini diberikan konteks yang mungkin relevan dengan pertanyaan. Abaikan konteks jika tidak relevan dengan pertanyaan. Beri tanggapan yang singkat dan komprehensif terhadap pertanyaan pengguna. Jika perlu, awali jawaban anda dengan 'Berdasarkan informasi yang saya miliki,'. Konteks: \
     {context}
 
     Pertanyaan: {question}
@@ -130,7 +130,7 @@ def generate_response_with_history(model_config):
     retriever = get_retriever(embedding_model)
     retriever_chain = RunnablePassthrough.assign(context=question_chain | retriever | (lambda docs: "\n\n".join([d.page_content for d in docs])))
 
-    rag_system_prompt = """Anda adalah chatbot berbahasa Indonesia yang bertugas untuk menjawab pertanyaan terkait SMP Santo Leo III. Berikut ini diberikan konteks yang mungkin relevan dengan pertanyaan. Abaikan konteks jika tidak relevan dengan pertanyaan. Beri tanggapan yang singkat dan komprehensif terhadap pertanyaan pengguna dan jangan katakan kepada pengguna bahwa Anda menerima konteks. Konteks: \
+    rag_system_prompt = """Anda adalah chatbot berbahasa Indonesia yang bertugas untuk menjawab pertanyaan terkait SMP Santo Leo III. Berikut ini diberikan konteks yang mungkin relevan dengan pertanyaan. Abaikan konteks jika tidak relevan dengan pertanyaan. Beri tanggapan yang singkat dan komprehensif terhadap pertanyaan pengguna. Jika perlu, awali jawaban anda dengan 'Berdasarkan informasi yang saya miliki,'. Konteks: \
         {context}
     """
     rag_prompt = ChatPromptTemplate.from_messages(
@@ -156,16 +156,7 @@ def generate_response_with_history(model_config):
 
     return with_message_history, session_id
 
-
-def get_chat_history_by_session(session_id):
-    chat_message_history = MongoDBChatMessageHistory(
-        session_id=session_id,
-        connection_string=st.secrets.mongo.MONGODB_ATLAS_CLUSTER_URI,
-        database_name="chatbot_db",
-        collection_name="chat_histories",
-    )
-    return chat_message_history.messages
-
+@st.cache_resource(show_spinner=False)
 def get_chat_session(session_id):
     return MongoDBChatMessageHistory(
         session_id=session_id,
@@ -185,7 +176,7 @@ def insert_chat_session(session_id, messages):
     chat_message_history.add_user_message(messages["user"])
     chat_message_history.add_ai_message(messages["ai"])
 
-@st.cache_resource
+@st.cache_resource(show_spinner=False)
 def load_llm_model(model_config):
     return HuggingFaceEndpoint(
         repo_id=model_config["model_name"],
@@ -198,7 +189,7 @@ def load_llm_model(model_config):
         huggingfacehub_api_token=st.secrets.hf.HUGGINGFACEHUB_API_TOKEN,
     )
 
-@st.cache_resource
+@st.cache_resource(show_spinner=False)
 def load_embedding_model(model_name):
     model_kwargs = {'device': 'cpu'}
     encode_kwargs = {'normalize_embeddings': False}

@@ -32,8 +32,8 @@ def login(username, password):
         st.session_state.is_authenticated = True
         st.session_state.profile_picture = user["picture_path"]
         return True
-
-    return False
+    else:
+        return False
 
 def logout():
     user = get_one_user({"username": st.session_state.username})
@@ -57,7 +57,7 @@ def logout():
         st.switch_page("app.py")
 
 def register(username, email, password, first_name, last_name, uploaded_file, role):
-    picture_path = ""
+    picture_path = None
     if uploaded_file:
         picture_path = save_picture(uploaded_file, username)
 
@@ -71,5 +71,6 @@ def register(username, email, password, first_name, last_name, uploaded_file, ro
         "role": role,
         "is_admin": False,
     }
+
     success, error_message = create_user(user_data)
     return success, error_message

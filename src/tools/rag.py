@@ -137,7 +137,7 @@ def get_retriever(model):
 
     return vector_store.as_retriever(search_type="similarity", search_kwargs={"k": 5})
 
-@st.cache_data
+@st.cache_data(show_spinner=False)
 def get_all_vectors():
     vectors_collection = get_collection("vectors")
     cursor = vectors_collection.find({})

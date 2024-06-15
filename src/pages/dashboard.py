@@ -14,14 +14,14 @@ def main():
                 st.image("assets/logo.png")
             with st.container(border=False):
                 st.divider()
-                with st.popover("Settings", use_container_width=True):
-                    if st.button("Account Details", use_container_width=True):
-                        profile_modal(st.session_state.username)
-                    if st.session_state.is_admin is True:
-                        if st.button("Home", use_container_width=True):
-                            st.switch_page("pages/home.py")
-                    if st.button("Logout", use_container_width=True):
-                        logout()
+                st.markdown("## Settings")
+                if st.button("Account Details", use_container_width=True):
+                    profile_modal(st.session_state.username)
+                if st.session_state.is_admin is True:
+                    if st.button("Home", use_container_width=True):
+                        st.switch_page("pages/home.py")
+                if st.button("Logout", use_container_width=True):
+                    logout()
 
         st.header("Dashboard")
         tab1, tab2, tab3, tab4 = st.tabs(["Users", "Conversations", "Documents", "LLMs"])
@@ -50,5 +50,5 @@ def main():
 
 if __name__ == "__main__":
     initialize_session()
-    st.set_page_config(page_title="Dashboard", page_icon="", layout="wide")
+    st.set_page_config(page_title="Dashboard", page_icon="assets/icon.jpeg", layout="wide")
     main()

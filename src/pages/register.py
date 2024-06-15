@@ -6,7 +6,7 @@ def main():
     check_auth("Register")
 
     with st.form("register", clear_on_submit=True):
-        st.markdown("#### Register")
+        st.html("<center><h2>Register</h2></center>")
 
         col1, col2 = st.columns(2)
         with col1:
@@ -16,23 +16,25 @@ def main():
         username = st.text_input("Username*")
         email = st.text_input("Email*")
         password = st.text_input("Password*", type="password")
-        role = st.selectbox("Role*", ("Student", "Parent", "Teacher/Staff"))
-        uploaded_file = st.file_uploader("Upload profile picture (optional)", ["jpg", "jpeg", "png"])
-
-        if st.form_submit_button("Register"):
-            if not first_name or not last_name or not username or not email or not password or not role:
-                st.warning("Please fill out all required fields.")
-            else:
-                success, error_message = register(username, email, password, first_name, last_name, uploaded_file, role)
-                if success:
-                    st.success("Successfully registered. You can now log in to your account!")
-                    st.rerun()
+        role = st.selectbox("Select Role*", ("Student", "Parent", "Teacher/Staff", "Other"))
+        uploaded_file = st.file_uploader("Upload Profile Picture (optional)", ["jpg", "jpeg", "png"])
+        st.html("<br/>")
+        col1, col2, col3 = st.columns(3)
+        with col2:
+            if st.form_submit_button("Register", use_container_width=True, type="primary"):
+                if not first_name or not last_name or not username or not email or not password or not role:
+                    st.warning("Please fill out all required fields.")
                 else:
-                    st.warning(error_message if error_message else "Registration unsuccessful. Please try again.")
+                    success, error_message = register(username, email, password, first_name, last_name, uploaded_file, role)
+                    if success:
+                        st.success("Successfully registered. You can now log in to your account!")
+                        st.rerun()
+                    else:
+                        st.warning(error_message if error_message else "Registration unsuccessful. Please try again.")
 
-    st.page_link("pages/login.py", label="Login here!")
+    st.page_link("pages/login.py", label="Log in to your account here!")
 
 if __name__ == "__main__":
     initialize_session()
-    st.set_page_config(page_title="Register", page_icon="", layout="centered")
+    st.set_page_config(page_title="Register", page_icon="assets/icon.jpeg", layout="centered")
     main()

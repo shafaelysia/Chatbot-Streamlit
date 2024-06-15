@@ -1,7 +1,7 @@
 import streamlit as st
 from components.profile_modal import profile_modal
 from tools.auth import logout
-from tools.chat import get_all_users_chats, get_chat_history_by_session
+from tools.chat import get_all_users_chats, get_chat_session
 from langchain_core.messages.human import HumanMessage
 from langchain_core.messages.ai import AIMessage
 
@@ -31,7 +31,9 @@ def sidebar():
                     st.session_state.chat_session_id = chat["session_id"]
                     st.session_state.chat_title = chat["title"]
                     st.session_state.messages = []
-                    for message in get_chat_history_by_session(st.session_state.chat_session_id):
+
+                    chat_session_messages = get_chat_session(st.session_state.chat_session_id)
+                    for message in chat_session_messages.messages:
                         if isinstance(message, HumanMessage):
                             st.session_state.messages.append({"role": "user", "content": message.content})
                         elif isinstance(message, AIMessage):
