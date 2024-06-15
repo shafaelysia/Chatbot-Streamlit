@@ -11,43 +11,43 @@ def conversations_menu():
     user_options = {user["username"]: user["_id"] for user in users}
 
     st.subheader("Chats Preview")
-    if st.session_state.user_preview_id is not None:
-        with st.container(border=True, height=500):
-            chat_ccol1, chat_col2 = st.columns([0.3, 0.7])
-            with chat_ccol1:
-                selected_username = st.selectbox("Select User", options=list(user_options.keys()))
+    with st.container(border=True, height=500):
+        chat_ccol1, chat_col2 = st.columns([0.3, 0.7])
+        with chat_ccol1:
+            selected_username = st.selectbox("Select User", options=list(user_options.keys()))
 
-                if selected_username:
-                    selected_user_id = user_options[selected_username]
-                    if st.session_state.user_preview_id != selected_user_id:
-                        st.session_state.user_preview_id = selected_user_id
-                        st.session_state.chat_session_id is None
-                        st.session_state.messages = []
+            if selected_username:
+                selected_user_id = user_options[selected_username]
+                if st.session_state.user_preview_id != selected_user_id:
+                    st.session_state.user_preview_id = selected_user_id
+                    st.session_state.chat_session_id is None
+                    st.session_state.messages = []
+                    st.rerun()
+
+    if st.session_state.user_preview_id is not None:
+        if st.session_state.user_preview_id is not None:
+            st.markdown("#### History")
+            for chat in get_all_users_chats({"user_id": st.session_state.user_preview_id}):
+                if st.session_state.chat_session_id == chat["session_id"]:
+                    chat_button = st.button(chat["title"], use_container_width=True, type="primary", key=chat["session_id"])
+                else:
+                    chat_button = st.button(chat["title"], use_container_width=True, key=chat["session_id"])
+
+                if chat_button:
+                    st.session_state.chat_session_id = chat["session_id"]
+                    st.session_state.chat_title = chat["title"]
+                    st.session_state.messages = []
+                    for message in get_chat_history_by_session(st.session_state.chat_session_id):
+                        if isinstance(message, HumanMessage):
+                            st.session_state.messages.append({"role": "user", "content": message.content})
+                        elif isinstance(message, AIMessage):
+                            st.session_state.messages.append({"role": "assistant", "content": message.content})
                         st.rerun()
 
-                if st.session_state.user_preview_id is not None:
-                    st.markdown("#### History")
-                    for chat in get_all_users_chats({"user_id": st.session_state.user_preview_id}):
-                        if st.session_state.chat_session_id == chat["session_id"]:
-                            chat_button = st.button(chat["title"], use_container_width=True, type="primary", key=chat["session_id"])
-                        else:
-                            chat_button = st.button(chat["title"], use_container_width=True, key=chat["session_id"])
-
-                        if chat_button:
-                            st.session_state.chat_session_id = chat["session_id"]
-                            st.session_state.chat_title = chat["title"]
-                            st.session_state.messages = []
-                            for message in get_chat_history_by_session(st.session_state.chat_session_id):
-                                if isinstance(message, HumanMessage):
-                                    st.session_state.messages.append({"role": "user", "content": message.content})
-                                elif isinstance(message, AIMessage):
-                                    st.session_state.messages.append({"role": "assistant", "content": message.content})
-                            st.rerun()
-
-            with chat_col2:
-                if st.session_state.chat_title is not None:
-                    st.markdown("### Title:" + st.session_state.chat_title)
-                    for message in st.session_state.messages:
-                        display_chat(message)
-                else:
-                    st.markdown("No user selected.")
+        with chat_col2:
+            if st.session_state.chat_title is not None:
+                st.markdown("### Title:" + st.session_state.chat_title)
+                for message in st.session_state.messages:
+                    display_chat(message)
+            else:
+                st.markdown("No user selected.")
