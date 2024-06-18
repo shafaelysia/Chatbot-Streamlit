@@ -5,7 +5,7 @@ from utils.helpers import initialize_session, check_auth
 def main():
     check_auth("Register")
 
-    with st.form("register", clear_on_submit=True):
+    with st.form("register"):
         st.html("<center><h2>Register</h2></center>")
 
         col1, col2 = st.columns(2)

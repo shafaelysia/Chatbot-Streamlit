@@ -7,8 +7,7 @@ from PyPDF2 import PdfReader
 from langchain_mongodb.vectorstores import MongoDBAtlasVectorSearch
 from langchain.docstore.document import Document
 from langchain.text_splitter import RecursiveCharacterTextSplitter
-from langchain_mongodb.vectorstores import MongoDBAtlasVectorSearch
-from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_huggingface import HuggingFaceEmbeddings
 from langchain.document_loaders.base import BaseLoader
 from tools.db import get_collection
 
@@ -277,7 +276,7 @@ def get_text_chunks(raw_text):
 
 def store_vectors(text_chunks):
     try:
-        model_name = "sentence-transformers/all-MiniLM-L6-v2"
+        model_name = "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
         embeddings = load_embedding_model(model_name)
 
         vectors_collection = get_collection("vectors")

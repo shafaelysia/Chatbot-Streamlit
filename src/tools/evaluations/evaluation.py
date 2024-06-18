@@ -18,7 +18,7 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(
 def evaluate_chatbot(model_config):
     logging.info("Starting chatbot evaluation.")
     authorize_hf()
-    questions, answers = load_and_extract_conversations("semv/sl-dataset")
+    questions, answers = load_and_extract_conversations("semv/chatbot-sl-test-dataset")
     evaluation_results = []
 
     for i, (question, expected_answer) in enumerate(zip(questions, answers), start=1):
@@ -83,7 +83,7 @@ def simulate_response(prompt, model_config):
 
     if st.session_state.embedding_model is None:
         logging.info("Loading embedding model.")
-        embedding_model = load_embedding_model("sentence-transformers/all-MiniLM-L6-v2")
+        embedding_model = load_embedding_model("sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2")
     else:
         embedding_model = st.session_state.embedding_model
 

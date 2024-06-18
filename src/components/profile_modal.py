@@ -41,7 +41,7 @@ def profile_modal(username):
             with name_col2:
                 last_name = st.text_input("Last Name", value=user_data["last_name"])
 
-            role = st.selectbox("User Role", options=["Student", "Teacher / Staff", "Parent"])
+            role = st.selectbox("User Role", options=["Student", "Teacher / Staff", "Parent", "Other"])
             role = user_data["role"]
 
             btn_col1, btn_col2= st.columns(2)

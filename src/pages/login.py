@@ -5,7 +5,7 @@ from utils.helpers import initialize_session, check_auth
 def main():
     check_auth("Login")
 
-    with st.form("login", clear_on_submit=True):
+    with st.form("login"):
         st.html("<center><h2>Login</h2></center>")
         username = st.text_input("Username")
         password = st.text_input("Password", type="password")

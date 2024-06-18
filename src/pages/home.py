@@ -1,7 +1,7 @@
 import streamlit as st
 from utils.helpers import initialize_session, check_auth, check_session_states
 from components.sidebar import sidebar
-from tools.chat import display_chat, generate_response, load_llm_model, update_chat_title
+from tools.chat import display_chat, generate_response, load_llm_model, update_chat_title, delete_chat
 import random
 import time
 
@@ -14,13 +14,19 @@ def main():
             with title_col1:
                 st.markdown("### " + st.session_state.chat_title)
             with title_col2:
-                with st.popover("Edit title"):
+                with st.popover("Edit title", use_container_width=True):
                     with st.form("edit", clear_on_submit=True):
                         new_title = st.text_input("New Title")
                         if st.form_submit_button("Submit"):
                             update_chat_title({"session_id": st.session_state.chat_session_id}, new_title)
                             st.session_state.chat_title = new_title
                             st.rerun()
+                if st.button("Delete Chat", use_container_width=True, type="primary"):
+                    delete_chat({"session_id": st.session_state.chat_session_id})
+                    st.session_state.chat_session_id = None
+                    st.session_state.messages = []
+                    st.session_state.chat_title = None
+                    st.rerun()
         else:
             st.markdown("### New Chat")
         tab1, tab2= st.tabs(["Chat", "Model Configuration"])
@@ -73,17 +79,6 @@ def main():
             st.warning("You need to log in first!")
             if st.button("Back"):
                 st.switch_page("app.py")
-
-def response_generator():
-    time.sleep(3)
-    response = random.choice(
-        [
-            "Hello there! How can I assist you today?",
-            "Hi, human! Is there anything I can help you with?",
-            "Do you need help?",
-        ]
-    )
-    return response
 
 if __name__ == "__main__":
     initialize_session()

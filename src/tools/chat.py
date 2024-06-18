@@ -74,7 +74,7 @@ def generate_response_without_history(prompt, model_config):
         llm_model = st.session_state.llm_model
 
     if st.session_state.embedding_model is None:
-        embedding_model = load_embedding_model("sentence-transformers/all-MiniLM-L6-v2")
+        embedding_model = load_embedding_model("sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2")
     else:
         embedding_model = st.session_state.embedding_model
 
@@ -108,7 +108,7 @@ def generate_response_with_history(model_config):
         llm_model = st.session_state.llm_model
 
     if st.session_state.embedding_model is None:
-        embedding_model = load_embedding_model("sentence-transformers/all-MiniLM-L6-v2")
+        embedding_model = load_embedding_model("sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2")
     else:
         embedding_model = st.session_state.embedding_model
 

@@ -16,7 +16,7 @@ def main():
             st.session_state.llm_model = load_llm_model(model_config)
 
         if st.session_state.embedding_model is None:
-            st.session_state.embedding_model = load_embedding_model("sentence-transformers/all-MiniLM-L6-v2")
+            st.session_state.embedding_model = load_embedding_model("sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2")
     check_auth("App")
 
 if __name__ == "__main__":

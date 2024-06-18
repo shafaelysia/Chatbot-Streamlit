@@ -22,6 +22,7 @@ def conversations_menu():
                     st.session_state.user_preview_id = selected_user_id
                     st.session_state.chat_session_id is None
                     st.session_state.messages = []
+                    st.session_state.title = None
                     st.rerun()
 
             if st.session_state.user_preview_id is not None:
@@ -46,7 +47,7 @@ def conversations_menu():
 
         with chat_col2:
             if st.session_state.chat_title is not None:
-                st.markdown("### Title:" + st.session_state.chat_title)
+                st.subheader(st.session_state.chat_title)
                 for message in st.session_state.messages:
                     display_chat(message)
             else:
