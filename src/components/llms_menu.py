@@ -1,5 +1,6 @@
 import os
 import streamlit as st
+import pandas as pd
 from tools.evaluations.evaluation import evaluate_chatbot
 from tools.chat import load_llm_model
 
@@ -33,13 +34,54 @@ def llms_menu():
         if st.form_submit_button("Save"):
             st.session_state.llm_model = load_llm_model(model_config)
 
-    st.subheader("Model Evaluation")
-    if st.button("Evaluate Model Performance", type="primary"):
-        csv = evaluate_chatbot(model_config)
-        if csv:
-            st.success("Model evaluation successful!")
-            file_path = os.path.join("tools/evaluatioins", csv)
-            with open(file_path, "rb") as f:
-                st.download_button("Download CSV", data=f, file_name="evaluation_result.csv")
+    eval_col1, eval_col2 = st.columns(2)
+    with eval_col1:
+        st.subheader("Model Evaluation")
+        if st.button("Evaluate Model Performance", type="primary"):
+            if evaluate_chatbot(model_config):
+                st.success("Model evaluation successful!")
+                st.rerun()
+            else:
+                st.error("Model evaluation unsuccessful!")
+    with eval_col2:
+        st.subheader("Evaluation Results")
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        results_path = os.path.join(current_dir, "../tools/evaluations/evaluation_results")
+
+        if os.path.exists(results_path):
+            csv_list = os.listdir(results_path)
+            if csv_list:
+                csv_data_list = []
+                csv_no = 0
+                for csv in csv_list:
+                    if csv.endswith(".csv"):
+                        csv_no += 1
+                        file = {
+                            "No": csv_no,
+                            "File Name": csv,
+                        }
+                        csv_data_list.append(file)
+                with st.container():
+                    csv_df = pd.DataFrame(csv_data_list)
+
+                    csv_event = st.dataframe(
+                        csv_df,
+                        hide_index=True,
+                        on_select="rerun",
+                        selection_mode="single-row",
+                        key="csv"
+                    )
+
+                    if csv_event.selection and len(csv_event.selection['rows']):
+                        selected_row = csv_event.selection['rows'][0]
+                        filename = csv_df.iloc[selected_row]['File Name']
+                        file_path = os.path.join(results_path, filename)
+                        with open(file_path, "rb") as f:
+                            st.download_button("Download CSV", data=f, file_name="evaluation_results.csv")
+                        if st.button("Delete CSV"):
+                            os.remove(file_path)
+                            st.rerun()
+            else:
+                st.warning("No evaluation results found")
         else:
-            st.error("Model evaluation unsuccessful!")
+            st.warning("Path not found")

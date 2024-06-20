@@ -39,7 +39,7 @@ def load_and_extract_conversations(dataset_name):
     dataset = load_dataset(dataset_name)
     questions = []
     answers = []
-    for item in dataset['train']:
+    for item in dataset['test']:
         conversation = item['conversations']
         for i in range(len(conversation) - 1):
             if conversation[i]['role'] == 'user' and conversation[i+1]['role'] == 'assistant':
