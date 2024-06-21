@@ -12,7 +12,6 @@ from utils.helpers import authorize_hf
 from tools.chat import load_llm_model, load_embedding_model
 from tools.rag import get_retriever
 
-# Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 def evaluate_chatbot(model_config):

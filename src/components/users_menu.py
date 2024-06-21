@@ -15,7 +15,7 @@ def users_menu():
                 "Email": user["email"],
                 "Name": user["first_name"] + ' ' + user["last_name"],
                 "Role": user["role"],
-                "Picture": convert_image_to_base64(user["picture_path"]) if user["picture_path"] !=  "" else user["picture_path"],
+                "Picture": convert_image_to_base64(user["picture_path"]) if user["picture_path"] not in ["", None] else user["picture_path"],
                 "Administrator": user["is_admin"],
                 "Join Date": convert_to_local(user["created_at"]) if user["created_at"] is not None else None,
                 "Update Date": convert_to_local(user["updated_at"]) if user["updated_at"] is not None else None,
@@ -182,6 +182,7 @@ def add_modal():
                         "picture_path": uploaded_file if uploaded_file else None,
                         "role": role,
                         "is_admin": admin,
+                        "is_active": False
                     }
                     success, error_message = create_user(user_data)
                     if success:

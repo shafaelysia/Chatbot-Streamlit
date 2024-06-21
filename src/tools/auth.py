@@ -4,6 +4,7 @@ from utils.helpers import check_password, clear_session
 from tools.user import get_one_user, create_user, save_picture, update_user
 
 def login(username, password):
+    """Logs in a user by checking their credentials."""
     user = get_one_user({"username": username})
     if user:
         user_data = {
@@ -36,6 +37,7 @@ def login(username, password):
         return False
 
 def logout():
+    """Logs out the current user by clearing the session."""
     user = get_one_user({"username": st.session_state.username})
     if user:
         user_data = {
@@ -52,14 +54,14 @@ def logout():
             "is_active": False,
             "last_login": datetime.now(timezone.utc)
         }
+
         update_user({"username": st.session_state.username}, user_data)
         clear_session()
+
         st.switch_page("app.py")
 
 def register(username, email, password, first_name, last_name, uploaded_file, role):
-    picture_path = None
-    if uploaded_file:
-        picture_path = save_picture(uploaded_file, username)
+    """Registers a new user with the provided details."""
 
     user_data = {
         "username": username,
@@ -67,9 +69,10 @@ def register(username, email, password, first_name, last_name, uploaded_file, ro
         "password": password,
         "first_name": first_name,
         "last_name": last_name,
-        "picture_path": picture_path,
+        "picture_path": uploaded_file,
         "role": role,
         "is_admin": False,
+        "is_active": False
     }
 
     success, error_message = create_user(user_data)

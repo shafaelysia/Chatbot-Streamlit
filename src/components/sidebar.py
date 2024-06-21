@@ -1,9 +1,9 @@
 import streamlit as st
+from langchain_core.messages.human import HumanMessage
+from langchain_core.messages.ai import AIMessage
 from components.profile_modal import profile_modal
 from tools.auth import logout
 from tools.chat import get_all_users_chats, get_chat_session
-from langchain_core.messages.human import HumanMessage
-from langchain_core.messages.ai import AIMessage
 
 def sidebar():
     with st.sidebar:

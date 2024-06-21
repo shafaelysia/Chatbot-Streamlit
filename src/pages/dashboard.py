@@ -3,11 +3,14 @@ from components.users_menu import users_menu
 from components.conversations_menu import conversations_menu
 from components.docs_menu import docs_menu
 from components.llms_menu import llms_menu
-from tools.auth import logout
-from utils.helpers import initialize_session, check_auth, check_session_states
 from components.profile_modal import profile_modal
+from tools.auth import logout
+from utils.helpers import check_auth, initialize_session, clear_chat_states
 
 def main():
+    initialize_session()
+    clear_chat_states()
+
     if check_auth("Dashboard"):
         with st.sidebar:
             with st.container(border=False):
@@ -49,6 +52,5 @@ def main():
                 st.switch_page("pages/home.py")
 
 if __name__ == "__main__":
-    initialize_session()
     st.set_page_config(page_title="Dashboard", page_icon="assets/icon.jpeg", layout="wide")
     main()

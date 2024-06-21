@@ -1,10 +1,9 @@
 import streamlit as st
-import pandas as pd
-from datetime import datetime, timezone
-from tools.chat import get_all_users_chats, get_chat_session, display_chat
-from tools.user import get_all_users
 from langchain_core.messages.human import HumanMessage
 from langchain_core.messages.ai import AIMessage
+from tools.chat import get_all_users_chats, get_chat_session, display_chat
+from tools.user import get_all_users
+from utils.helpers import clear_chat_states
 
 def conversations_menu():
     users = get_all_users()
@@ -20,9 +19,7 @@ def conversations_menu():
                 selected_user_id = user_options[selected_username]
                 if st.session_state.user_preview_id != selected_user_id:
                     st.session_state.user_preview_id = selected_user_id
-                    st.session_state.chat_session_id is None
-                    st.session_state.messages = []
-                    st.session_state.title = None
+                    clear_chat_states()
                     st.rerun()
 
             if st.session_state.user_preview_id is not None:

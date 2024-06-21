@@ -3,7 +3,7 @@ import uuid
 import streamlit as st
 from datetime import datetime, timezone
 from langchain_mongodb.chat_message_histories import MongoDBChatMessageHistory
-from langchain_huggingface import HuggingFaceEndpoint, HuggingFaceEmbeddings, ChatHuggingFace, HuggingFacePipeline
+from langchain_huggingface import HuggingFaceEndpoint, HuggingFaceEmbeddings, ChatHuggingFace
 from langchain_core.runnables.history import RunnableWithMessageHistory
 from langchain_core.prompts import MessagesPlaceholder, ChatPromptTemplate
 from langchain_core.runnables import RunnablePassthrough
@@ -13,38 +13,43 @@ from tools.rag import get_retriever
 from utils.helpers import convert_image_to_base64
 
 def create_chat(chat_data):
+    """Creates a new conversation."""
     return Conversation.create(chat_data)
 
 @st.cache_data(show_spinner=False)
 def get_one_chat(criteria):
+    """Retrieves one conversation based on given criteria."""
     return Conversation.get_one(criteria)
 
 def get_all_users_chats(criteria):
-    return list(Conversation.get_user_chats(criteria))
-
-@st.cache_data(show_spinner=False)
-def get_all_chats_with_history():
-    pass
+    """Retrieves all user's conversations based on given criteria."""
+    return Conversation.get_user_chats(criteria)
 
 def update_chat_title(criteria, chat_title):
+    """Updates a conversation's title based on given criteria."""
     return Conversation.update_title(criteria, chat_title)
 
 def update_chat_updated_at(criteria):
+    """Updates a conversation's updated_at based on given criteria."""
     return Conversation.update_updated_at(criteria)
 
 def delete_chat(criteria):
+    """Deletes a conversation based on given criteria."""
     return Conversation.delete(criteria)
 
 def generate_session_id():
+    """Generates a new unique session ID."""
     return str(uuid.uuid4())
 
 def display_chat(message):
+    """Displays a chat message using Streamlit based on the message role and profile picture."""
     if (message["role"] == "user") and st.session_state.profile_picture not in [None, ""]:
         return st.chat_message(message["role"], avatar=convert_image_to_base64(st.session_state.profile_picture)).markdown(message["content"])
     else:
         return st.chat_message(message["role"]).markdown(message["content"])
 
 def generate_response(prompt, model_config):
+    """Generates a response based on the prompt and model configuration."""
     if st.session_state.chat_session_id is None:
         chain, session_id = generate_response_without_history(prompt, model_config)
         response = chain.invoke(prompt)
@@ -55,6 +60,7 @@ def generate_response(prompt, model_config):
     return response
 
 def generate_response_without_history(prompt, model_config):
+    """Generates a response without chat history."""
     session_id = generate_session_id()
     st.session_state.chat_session_id = session_id
     existing_chat = get_one_chat({"session_id": session_id})
@@ -99,6 +105,7 @@ def generate_response_without_history(prompt, model_config):
     return naive_rag_chain, session_id
 
 def generate_response_with_history(model_config):
+    """Generates a response with chat history."""
     session_id = st.session_state.chat_session_id
     update_chat_updated_at({"session_id": session_id})
 
@@ -158,6 +165,7 @@ def generate_response_with_history(model_config):
 
 @st.cache_resource(show_spinner=False)
 def get_chat_session(session_id):
+    """Retrieves a chat session history from the database based on the session ID."""
     return MongoDBChatMessageHistory(
         session_id=session_id,
         connection_string=st.secrets.mongo.MONGODB_ATLAS_CLUSTER_URI,
@@ -166,6 +174,7 @@ def get_chat_session(session_id):
     )
 
 def insert_chat_session(session_id, messages):
+    """Inserts user and chatbot messages into the database."""
     chat_message_history = MongoDBChatMessageHistory(
         session_id=session_id,
         connection_string=st.secrets.mongo.MONGODB_ATLAS_CLUSTER_URI,
@@ -178,6 +187,7 @@ def insert_chat_session(session_id, messages):
 
 @st.cache_resource(show_spinner=False)
 def load_llm_model(model_config):
+    """Loads the large language model (LLM) based on the provided model configuration."""
     return HuggingFaceEndpoint(
         repo_id=model_config["model_name"],
         streaming=True,
@@ -191,6 +201,7 @@ def load_llm_model(model_config):
 
 @st.cache_resource(show_spinner=False)
 def load_embedding_model(model_name):
+    """Loads the large embedding model based on the provided model name."""
     model_kwargs = {'device': 'cpu'}
     encode_kwargs = {'normalize_embeddings': False}
 
