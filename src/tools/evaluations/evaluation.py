@@ -48,7 +48,7 @@ def load_and_extract_conversations(dataset_name):
     return questions, answers
 
 def save_results(results, model_config):
-    filename = "evaluation_results/evaluation_results_" + datetime.now(timezone.utc).strftime('%Y-%m-%d_%H-%M-%S') + ".csv"
+    filename = "evaluation_results/evaluation_results_" + datetime.now().strftime('%Y-%m-%d_%H-%M-%S') + ".csv"
     current_dir = os.path.dirname(os.path.abspath(__file__))
     file_path = os.path.join(current_dir, filename)
 
