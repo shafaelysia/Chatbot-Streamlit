@@ -9,16 +9,14 @@ def main():
         model_config = {
                 "model_name": "meta-llama/Meta-Llama-3-8B-Instruct",
                 "temperature": 1.0,
-                "top_k": 50,
                 "top_p": 0.8,
-                "repetition_penalty": 1.0,
-                "max_tokens": 8000
+                "max_tokens": 4000
         }
         if st.session_state.llm_model is None:
             st.session_state.llm_model = load_llm_model(model_config)
 
         if st.session_state.embedding_model is None:
-            st.session_state.embedding_model = load_embedding_model("sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2")
+            st.session_state.embedding_model = load_embedding_model("firqaaa/indo-sentence-bert-base")
 
     st.switch_page("pages/login.py")
 

@@ -127,7 +127,7 @@ def create_json_vectors():
 
 def process_pdfs_in_folder(folder_path):
     """Processes all PDF files in the given folder path."""
-    file_exception = ["Tatib Siswa 23-24.pdf"]
+    file_exception = ["Tatib Siswa 23-24.pdf", "Kalender Akademik 23-24.pdf"]
     for filename in os.listdir(folder_path):
         if filename.endswith(".pdf"):
             file_path = os.path.join(folder_path, filename)
@@ -162,10 +162,10 @@ def get_text_chunks(raw_text):
     """Splits raw text into chunks and returns a list of Document objects."""
     try:
         text_splitter = RecursiveCharacterTextSplitter(
-            chunk_size=1000,
-            chunk_overlap=100,
+            chunk_size=300,
+            chunk_overlap=50,
             length_function=len,
-            separators=["\n\n", "\n"]
+            separators=["\n\n", "\n", " ", ""]
         )
         text_chunks = text_splitter.split_text(raw_text)
         docs = text_splitter.create_documents(text_chunks)
@@ -177,7 +177,7 @@ def get_text_chunks(raw_text):
 def store_vectors(text_chunks):
     """Stores vectors in the database from a list of Document objects."""
     try:
-        model_name = "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
+        model_name = "firqaaa/indo-sentence-bert-base"
         embeddings = load_embedding_model(model_name)
 
         vectors_collection = get_collection("vectors")

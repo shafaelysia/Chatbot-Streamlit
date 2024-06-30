@@ -21,7 +21,6 @@ class Conversation:
     def to_dict(self):
         """Converts the Conversation instance to a dictionary."""
         return {
-            "_id": self._id,
             "user_id": self.user_id,
             "title": self.title,
             "session_id": self.session_id,

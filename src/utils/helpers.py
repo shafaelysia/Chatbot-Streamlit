@@ -5,6 +5,12 @@ import base64
 import huggingface_hub
 import streamlit as st
 
+SYSTEM_MESSAGE = """
+Anda adalah chatbot berbahasa Indonesia yang bertugas untuk menjawab pertanyaan terkait SMP Santo Leo III. \
+Gunakan konteks yang diberikan untuk menjawab pertanyaan dengan singkat, komprehensif, dan natural, tanpa menyebutka bahwa Anda diberikan konteks secara eksplisit. \
+Abaikan konteks jika tidak relevan.
+"""
+
 def hash_password(password):
     """Hashes a password using bcrypt."""
     salt = bcrypt.gensalt()
@@ -26,7 +32,7 @@ def initialize_session():
         'profile_picture': None,
         'chat_session_id': None,
         'chat_title': None,
-        'messages': [],
+        'messages': [{"role": "system", "content": SYSTEM_MESSAGE}],
         'llm_model': None,
         'embedding_model': None,
         'user_preview_id': None
