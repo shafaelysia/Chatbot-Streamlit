@@ -19,9 +19,7 @@ def conversations_menu():
                 selected_user_id = user_options[selected_username]
                 if st.session_state.user_preview_id != selected_user_id:
                     st.session_state.user_preview_id = selected_user_id
-                    st.session_state.chat_session_id = None
-                    st.session_state.messages = []
-                    st.session_state.chat_title = None
+                    clear_chat_states()
                     st.rerun()
 
             if st.session_state.user_preview_id is not None:
@@ -33,9 +31,9 @@ def conversations_menu():
                         chat_button = st.button(chat["title"], use_container_width=True, key=chat["session_id"])
 
                     if chat_button:
+                        clear_chat_states()
                         st.session_state.chat_session_id = chat["session_id"]
                         st.session_state.chat_title = chat["title"]
-                        st.session_state.messages = []
 
                         chat_session_messages = get_chat_session(st.session_state.chat_session_id)
                         for message in chat_session_messages.messages:
@@ -47,7 +45,7 @@ def conversations_menu():
         with chat_col2:
             if st.session_state.chat_title is not None:
                 st.subheader(st.session_state.chat_title)
-                for message in st.session_state.messages:
+                for message in st.session_state.messages[1:]:
                     display_chat(message)
             else:
                 st.markdown("No chat selected.")

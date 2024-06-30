@@ -73,15 +73,9 @@ def save_results(results, model_config):
     return filename
 
 def simulate_response(prompt, model_config):
-    logging.info("Simulating response for the prompt.")
-    if st.session_state.llm_model is None:
-        logging.info("Loading LLM model.")
-        llm_model = load_llm_model(model_config)
-    else:
-        llm_model = st.session_state.llm_model
-
+    """Generates a response based on the prompt and model configuration."""
+    logging.info("Loading embedding model.")
     if st.session_state.embedding_model is None:
-        logging.info("Loading embedding model.")
         embedding_model = load_embedding_model("firqaaa/indo-sentence-bert-base")
     else:
         embedding_model = st.session_state.embedding_model
@@ -89,24 +83,39 @@ def simulate_response(prompt, model_config):
     retriever = get_retriever(embedding_model)
     retrieve = {"context": retriever | (lambda docs: "\n\n".join([d.page_content for d in docs])), "question": RunnablePassthrough()}
 
-    template = """Anda adalah chatbot berbahasa Indonesia yang bertugas untuk menjawab pertanyaan terkait SMP Santo Leo III.
-    Gunakan konteks yang diberikan untuk menjawab pertanyaan dengan singkat dan komprehensif, tanpa menyebutkannya secara eksplisit.
+    context = retrieve["context"].invoke(prompt)
+    prompt_template = {
+        "role": "user",
+        "content": f"Konteks: {context} \nPertanyaan: {prompt}"
+    }
 
-    Konteks: {context}
+    response = llm_chat_completion(prompt_template, model_config)
+    logging.info("Response generated.")
+    return response
 
-    Pertanyaan: {question}
+def llm_chat_completion(prompt, model_config):
+    """Generates a chat completion response from LLM using the provided prompt and model configuration."""
+    logging.info("Loading LLM.")
+    if st.session_state.llm_model is None:
+        llm_model = load_llm_model(model_config)
+    else:
+        llm_model = st.session_state.llm_model
+
+    messages = []
+    SYSTEM_MESSAGE = """
+    Anda adalah chatbot berbahasa Indonesia yang bertugas untuk menjawab pertanyaan terkait SMP Santo Leo III. \
+    Gunakan konteks yang diberikan untuk menjawab pertanyaan dengan singkat, komprehensif, dan natural, tanpa menyebutka bahwa Anda diberikan konteks secara eksplisit. \
+    Abaikan konteks jika tidak relevan.
     """
-    final_prompt = ChatPromptTemplate.from_template(template)
+    SYSTEM_MESSAGE_DICT = {"role": "system", "content": SYSTEM_MESSAGE}
+    messages.append(SYSTEM_MESSAGE_DICT)
+    messages.append(prompt)
 
-    parse_output = StrOutputParser()
-    naive_rag_chain = (
-        retrieve
-        | final_prompt
-        | ChatHuggingFace(llm=llm_model)
-        | parse_output
+    response = llm_model.chat_completion(
+        messages,
+        max_tokens=model_config["max_tokens"],
+        temperature=model_config["temperature"],
+        top_p=model_config["top_p"],
     )
 
-    response = naive_rag_chain.invoke(prompt)
-    logging.info("Response generated.")
-    logging.info(f"Total tokens used: {len(response.split())}")
-    return response
+    return response.choices[0].message.content

@@ -29,14 +29,12 @@ def main():
             st.markdown("### New Chat")
         tab1, tab2= st.tabs(["Chat", "Model Configuration"])
         with tab1:
-            for message in st.session_state.messages[0:]:
+            for message in st.session_state.messages[1:]:
                 display_chat(message)
 
         with tab2:
             TEMPERATURE_RANGE = (0.1, 2.0)
-            TOP_K_RANGE = (1, 100)
             TOP_P_RANGE = (0.1, 1.0)
-            REPETITION_PENALTY_RANGE = (1.0, 2.0)
             MAX_TOKENS_RANGE = (100, 5000)
             model_config = {
                 "model_name": "meta-llama/Meta-Llama-3-8B-Instruct",

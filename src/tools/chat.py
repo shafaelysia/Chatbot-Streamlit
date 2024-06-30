@@ -92,12 +92,15 @@ def llm_chat_completion(prompt, model_config):
     else:
         llm_model = st.session_state.llm_model
 
-    system_prompt = st.session_state.messages[0]
-    last_six_nessages = st.session_state.messages[-6:]
-    result = [system_prompt] + last_six_nessages
+    if len(st.session_state.messages) > 7:
+        system_prompt = st.session_state.messages[0]
+        last_six_messages = st.session_state.messages[-7:]
+        messages = [system_prompt] + last_six_messages
+    else:
+        messages = st.session_state.messages
 
     response = llm_model.chat_completion(
-        result,
+        messages,
         max_tokens=model_config["max_tokens"],
         temperature=model_config["temperature"],
         top_p=model_config["top_p"],

@@ -22,7 +22,7 @@ def get_retriever(model):
         index_name=index_name,
     )
 
-    return vector_store.as_retriever(search_type="similarity", search_kwargs={"k": 5})
+    return vector_store.as_retriever(search_type="similarity", search_kwargs={"k": 4})
 
 @st.cache_data(show_spinner=False)
 def get_all_vectors():

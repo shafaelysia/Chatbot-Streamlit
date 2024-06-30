@@ -10,6 +10,7 @@ Anda adalah chatbot berbahasa Indonesia yang bertugas untuk menjawab pertanyaan 
 Gunakan konteks yang diberikan untuk menjawab pertanyaan dengan singkat, komprehensif, dan natural, tanpa menyebutka bahwa Anda diberikan konteks secara eksplisit. \
 Abaikan konteks jika tidak relevan.
 """
+SYSTEM_MESSAGE_DICT = {"role": "system", "content": SYSTEM_MESSAGE}
 
 def hash_password(password):
     """Hashes a password using bcrypt."""
@@ -32,7 +33,7 @@ def initialize_session():
         'profile_picture': None,
         'chat_session_id': None,
         'chat_title': None,
-        'messages': [{"role": "system", "content": SYSTEM_MESSAGE}],
+        'messages': [SYSTEM_MESSAGE_DICT],
         'llm_model': None,
         'embedding_model': None,
         'user_preview_id': None
@@ -65,7 +66,7 @@ def clear_session():
 
 def clear_chat_states():
     st.session_state.chat_session_id = None
-    st.session_state.messages = []
+    st.session_state.messages = [SYSTEM_MESSAGE_DICT]
     st.session_state.chat_title = None
 
 def check_auth(page):

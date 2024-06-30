@@ -6,9 +6,7 @@ from tools.chat import load_llm_model
 
 def llms_menu():
     TEMPERATURE_RANGE = (0.1, 2.0)
-    TOP_K_RANGE = (1, 100)
     TOP_P_RANGE = (0.1, 1.0)
-    REPETITION_PENALTY_RANGE = (1.0, 2.0)
     MAX_TOKENS_RANGE = (100, 5000)
     model_config = {
         "model_name": "meta-llama/Meta-Llama-3-8B-Instruct",
