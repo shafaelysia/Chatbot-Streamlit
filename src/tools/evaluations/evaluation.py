@@ -3,6 +3,7 @@ import csv
 import logging
 import streamlit as st
 from datetime import datetime, timezone
+from time import time
 from langchain_huggingface import ChatHuggingFace
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.runnables import RunnablePassthrough
@@ -22,12 +23,17 @@ def evaluate_chatbot(model_config):
 
     for i, (question, expected_answer) in enumerate(zip(questions, answers), start=1):
         logging.info(f"Evaluating question {i}: {question}")
+
+        start_time = time()
         response = simulate_response(question, model_config)
+        duration = time() - start_time
+
         evaluation_results.append({
             "No.": i,
             "Question": question,
             "Response": response,
             "Expected": expected_answer,
+            "Time Taken (s)": duration
         })
 
     logging.info("Evaluation completed. Saving results.")
@@ -55,7 +61,7 @@ def save_results(results, model_config):
     logging.info(f"Saving results to {file_path}")
 
     with open(file_path, "w", newline="", encoding="utf-8") as csvfile:
-        fieldnames = ["No.", "Question", "Response", "Expected"]
+        fieldnames = ["No.", "Question", "Response", "Expected", "Time Taken (s)"]
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
         writer.writeheader()
         for result in results:
@@ -84,16 +90,12 @@ def simulate_response(prompt, model_config):
     retrieve = {"context": retriever | (lambda docs: "\n\n".join([d.page_content for d in docs])), "question": RunnablePassthrough()}
 
     context = retrieve["context"].invoke(prompt)
-    prompt_template = {
-        "role": "user",
-        "content": f"Konteks: {context} \nPertanyaan: {prompt}"
-    }
 
-    response = llm_chat_completion(prompt_template, model_config)
+    response = llm_chat_completion(prompt, context, model_config)
     logging.info("Response generated.")
     return response
 
-def llm_chat_completion(prompt, model_config):
+def llm_chat_completion(prompt, context, model_config):
     """Generates a chat completion response from LLM using the provided prompt and model configuration."""
     logging.info("Loading LLM.")
     if st.session_state.llm_model is None:
@@ -108,8 +110,20 @@ def llm_chat_completion(prompt, model_config):
     Abaikan konteks jika tidak relevan.
     """
     SYSTEM_MESSAGE_DICT = {"role": "system", "content": SYSTEM_MESSAGE}
-    messages.append(SYSTEM_MESSAGE_DICT)
-    messages.append(prompt)
+
+    if model_config["model_name"] == "mistralai/Mistral-7B-Instruct-v0.3":
+        final_prompt = {
+            "role": "user",
+            "content": f"{SYSTEM_MESSAGE} \nKonteks: {context} \nBerikut ini adalah pertanyaan yang harus Anda jawab. Pertanyaan: {prompt}"
+        }
+        messages.append(final_prompt)
+    else:
+        final_prompt = {
+            "role": "user",
+            "content": f"Konteks: {context} \nBerikut ini adalah pertanyaan yang harus Anda jawab. Pertanyaan: {prompt}"
+        }
+        messages.append(SYSTEM_MESSAGE_DICT)
+        messages.append(final_prompt)
 
     response = llm_model.chat_completion(
         messages,

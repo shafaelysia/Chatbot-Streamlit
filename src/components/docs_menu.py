@@ -56,11 +56,12 @@ def docs_menu():
         else:
             st.write("No documents found.")
 
-        uploaded_pdf = st.file_uploader("Upload PDF", ["pdf"])
-        if st.button("Submit PDF", type="primary"):
-            upload_pdf(uploaded_pdf)
-            st.cache_data.clear()
-            st.rerun()
+        with st.form("upload pdf", clear_on_submit=True):
+            uploaded_pdf = st.file_uploader("Upload PDF", ["pdf"])
+            if st.form_submit_button("Submit PDF", type="primary"):
+                upload_pdf(uploaded_pdf)
+                st.cache_data.clear()
+                st.rerun()
     else:
         st.write(f"Directory does not exist: {pdf_path}")
     st.divider()
@@ -112,11 +113,12 @@ def docs_menu():
         else:
             st.write("No documents found.")
 
-        uploaded_json = st.file_uploader("Upload JSON", ["json"])
-        if st.button("Submit JSON", type="primary"):
-            upload_json(uploaded_json)
-            st.cache_data.clear()
-            st.rerun()
+        with st.form("upload json", clear_on_submit=True):
+            uploaded_json = st.file_uploader("Upload JSON", ["json"])
+            if st.form_submit_button("Submit JSON", type="primary"):
+                upload_json(uploaded_json)
+                st.cache_data.clear()
+                st.rerun()
     else:
         st.write(f"Directory does not exist: {json_path}")
     st.divider()

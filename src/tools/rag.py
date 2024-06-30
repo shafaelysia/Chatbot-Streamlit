@@ -162,7 +162,7 @@ def get_text_chunks(raw_text):
     """Splits raw text into chunks and returns a list of Document objects."""
     try:
         text_splitter = RecursiveCharacterTextSplitter(
-            chunk_size=300,
+            chunk_size=500,
             chunk_overlap=50,
             length_function=len,
             separators=["\n\n", "\n", " ", ""]

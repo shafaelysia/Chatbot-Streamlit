@@ -74,33 +74,50 @@ def generate_response(prompt, model_config):
     retrieve = {"context": retriever | (lambda docs: "\n\n".join([d.page_content for d in docs])), "question": RunnablePassthrough()}
 
     context = retrieve["context"].invoke(prompt)
-    prompt_template = {
-        "role": "user",
-        "content": f"Konteks: {context} \nPertanyaan: {prompt}"
-    }
 
-    response = llm_chat_completion(prompt_template, model_config)
+    response = llm_chat_completion(prompt, context, model_config)
     insert_chat_session(st.session_state.chat_session_id, {"user": prompt, "ai": response})
     return response
 
-def llm_chat_completion(prompt, model_config):
+def llm_chat_completion(prompt, context, model_config):
     """Generates a chat completion response from LLM using the provided prompt and model configuration."""
-    st.session_state.messages.append(prompt)
-
     if st.session_state.llm_model is None:
         llm_model = load_llm_model(model_config)
     else:
         llm_model = st.session_state.llm_model
 
-    if len(st.session_state.messages) > 7:
-        system_prompt = st.session_state.messages[0]
-        last_six_messages = st.session_state.messages[-7:]
-        messages = [system_prompt] + last_six_messages
+    system_message = st.session_state.messages[0]["content"]
+    messages = []
+
+    if model_config["model_name"] == "mistralai/Mistral-7B-Instruct-v0.3":
+        final_prompt = {
+            "role": "user",
+            "content": f"{system_message} \nKonteks: {context} \nBerikut ini adalah pertanyaan yang harus Anda jawab. Pertanyaan: {prompt}"
+        }
+
+        if len(st.session_state.messages) > 7:
+            system_prompt = st.session_state.messages[0]
+            last_six_messages = st.session_state.messages[-7:]
+            messages = [system_prompt] + last_six_messages
+        else:
+            messages = st.session_state.messages[1:]
     else:
-        messages = st.session_state.messages
+        final_prompt = {
+            "role": "user",
+            "content": f"\nKonteks: {context} \nBerikut ini adalah pertanyaan yang harus Anda jawab. Pertanyaan: {prompt}"
+        }
+
+        if len(st.session_state.messages) > 7:
+            last_six_messages = st.session_state.messages[-7:]
+            messages = last_six_messages
+        else:
+            messages = st.session_state.messages
+
+    messages_copy = messages.copy()
+    messages_copy[-1] = final_prompt
 
     response = llm_model.chat_completion(
-        messages,
+        messages_copy,
         max_tokens=model_config["max_tokens"],
         temperature=model_config["temperature"],
         top_p=model_config["top_p"],
