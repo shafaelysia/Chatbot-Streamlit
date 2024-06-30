@@ -4,6 +4,7 @@ from langchain_core.messages.ai import AIMessage
 from components.profile_modal import profile_modal
 from tools.auth import logout
 from tools.chat import get_all_users_chats, get_chat_session
+from utils.helpers import clear_chat_states
 
 def sidebar():
     with st.sidebar:
@@ -14,9 +15,7 @@ def sidebar():
             else:
                 new_chat_button = st.button("New Chat", use_container_width=True)
             if new_chat_button:
-                st.session_state.chat_session_id = None
-                st.session_state.messages = []
-                st.session_state.chat_title = None
+                clear_chat_states()
                 st.rerun()
 
         with st.container(height=250, border=False):
@@ -28,9 +27,9 @@ def sidebar():
                     chat_button = st.button(chat["title"], use_container_width=True, key=chat["session_id"])
 
                 if chat_button:
+                    clear_chat_states()
                     st.session_state.chat_session_id = chat["session_id"]
                     st.session_state.chat_title = chat["title"]
-                    st.session_state.messages = []
 
                     chat_session_messages = get_chat_session(st.session_state.chat_session_id)
                     for message in chat_session_messages.messages:
