@@ -107,7 +107,7 @@ def llm_chat_completion(prompt, context, model_config):
     SYSTEM_MESSAGE = """
     Anda adalah chatbot berbahasa Indonesia yang bertugas untuk menjawab pertanyaan terkait SMP Santo Leo III. \
     Gunakan konteks yang diberikan untuk menjawab pertanyaan dengan singkat, komprehensif, dan natural, tanpa menyebutka bahwa Anda diberikan konteks secara eksplisit. \
-    Abaikan konteks jika tidak relevan.
+    Abaikan konteks jika tidak relevan dengan pertanyaan pengguna.
     """
     SYSTEM_MESSAGE_DICT = {"role": "system", "content": SYSTEM_MESSAGE}
 
