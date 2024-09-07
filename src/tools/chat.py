@@ -3,6 +3,7 @@ import streamlit as st
 from datetime import datetime, timezone
 from huggingface_hub import InferenceClient
 from langchain_mongodb.chat_message_histories import MongoDBChatMessageHistory
+from langchain_core.runnables import RunnablePassthrough
 from langchain_huggingface import HuggingFaceEmbeddings
 from models.Conversation import Conversation
 from tools.rag import get_retriever
